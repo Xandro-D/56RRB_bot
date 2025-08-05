@@ -3,7 +3,9 @@ from discord.ext import commands
 
 #setup variebles
 
-ROLE_HIERARCHY = [
+
+# ------- Ground gooners --------
+GROUND_ROLE_HIERARCHY = [
     '[Private Third Class]',
     '[Private Second Class]',
     '[Private First Class]',
@@ -15,7 +17,46 @@ ROLE_HIERARCHY = [
     '[Specialist Major]'
 ]
 
-ROLE_PREFIX = ['PV3.', 'PV2.', 'PFC.', 'SP3.', 'SP2.', 'SP1.', 'MSP.', 'FSP.', 'SPM.']
+GROUND_ROLE_PREFIX = ['PV3.', 'PV2.', 'PFC.', 'SP3.', 'SP2.', 'SP1.', 'MSP.', 'FSP.', 'SPM.']
+
+# ------- NCO nerds -------
+NCO_ROLE_HIERARCHY = [
+    '[Corporal]',
+    '[Sergeant]',
+    '[Staff Sergeant]',
+    '[Sergeant First Class]',
+    '[Master Sergeant]'
+]
+
+NCO_ROLE_PREFIX = ['CPL.','SGT.','SSG.','SFC.','MSG.']
+
+# ----- AIR Giga chads ------
+
+AIR_ROLE_HIERARCHY = [
+    '[Airman Basic]',
+    '[Airman]',
+    '[Airman 1st Class]',
+    '[Airman Specialist]',
+    '[Senior Airman]',
+    '[Staff Sergeаnt]',
+    '[Technical Sergeаnt]',
+    '[Master Sergeаnt]'
+]
+
+AIR_ROLE_PREFIX = ['AMB.','AMN.','AFC.','AMS.','SRA.','SSG.','TSG.','MSG.']
+
+# ------ ARMOR gays -------
+ARMOR_ROLE_HIERARCHY = [
+    '[Crewman]',
+    '[Technical Crewman]',
+    '[Armor Sergeant]',
+    '[Armor Staff Sergeant]',
+    '[Gunnery Sergeant]',
+]
+
+ARMOR_ROLE_PREFIX = [
+    'CMN.','TCMD.','ASGT.','ASSG.','GYSGT.'
+]
 
 AUTHORIZED_ROLES = ['Admin',]
 
@@ -29,13 +70,13 @@ intents.members = True  # Needed to access member roles
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
-# Actually commands
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
 
 
-
+# Actually commands
 # docternate @user nick
 @bot.command()
 async def doc(ctx):
@@ -48,9 +89,7 @@ async def doc(ctx):
         # get the roles for new poeple
         role1 = discord.utils.get(ctx.guild.roles, name="Member")
         role2 = discord.utils.get(ctx.guild.roles, name="Waiting for BCT")
-
         target = ctx.message.mentions[0]
-
         content = ctx.message.content
         split_content = content.split()
         new_nick = (" " + split_content[2])
@@ -61,12 +100,37 @@ async def doc(ctx):
         await ctx.send("You are not authorized to do that.")
 
 
+async def promotion(user_ranks, target, branch, prefix_type,ctx):
+    current_index = branch.index(user_ranks[0])
+    next_index = current_index + 1
+    if next_index < len(branch):
+        # Get the name of the current rank and next rank, then search up the coresponding role
+        curent_rank_name = branch[current_index]
+        next_rank_name = branch[next_index]
+        current_role = discord.utils.get(target.guild.roles, name=curent_rank_name)
+        next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
+        # Add the next role (promotion) and remove the cleanup.
+        await target.add_roles(next_role)
+        await target.remove_roles(current_role)
+        # Get the prefix for the current role IE PFC.
+        # Split the current username by the Space inbetween the prefix and nickname, thn replace the prefix.
+        new_prefix = prefix_type[next_index]
+        nickname = target.display_name
+        nickname_parts = nickname.split(' ', 1)
+        # nickanme_parts [0] PFC
+        # nickanme_parts[1] User
+        new_nickname = new_prefix + " " + nickname_parts[1]
+        await target.edit(nick=new_nickname)
+        await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name))
+    else:
+        await ctx.send(target.display_name + " is already the highest rank in his/her branch")
 
 
 
 @bot.command()
 # the !promote command
 async def promote(ctx):
+    # First check to see if the sender has enough privelge to execurte command
     author = ctx.author
     role_names = [role.name for role in author.roles]
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
@@ -75,38 +139,32 @@ async def promote(ctx):
         target = ctx.message.mentions[0]
         # Get the roles of the suer.
         role_names = [role.name for role in target.roles]
-        # Filter for roles in the HIERACHY
-        user_ranks = [role for role in ROLE_HIERARCHY if role in role_names]
 
-        # Get the index of the rank from the target.
-        if user_ranks is not None:
-            current_index = ROLE_HIERARCHY.index(user_ranks[0])
-            next_index = current_index + 1
-            if next_index < len(ROLE_HIERARCHY):
+        # Filter for roles in each branch sepperatly
+        user_ranks_ground = [role for role in GROUND_ROLE_HIERARCHY if role in role_names]
+        nco_ranks = [role for role in NCO_ROLE_HIERARCHY if role in role_names]
+        air_ranks = [role for role in AIR_ROLE_HIERARCHY if role in role_names]
+        armor_ranks = [role for role in ARMOR_ROLE_HIERARCHY if role in role_names]
+        # If the target is in ground branch call promotion function with branch
+        if user_ranks_ground:
+            branch = GROUND_ROLE_HIERARCHY
+            prefix_type = GROUND_ROLE_PREFIX
+            await promotion(user_ranks_ground, target, branch,prefix_type,ctx)
+        if nco_ranks:
+            branch = NCO_ROLE_HIERARCHY
+            prefix_type = NCO_ROLE_PREFIX
+            await promotion(nco_ranks, target, branch, prefix_type,ctx)
+        if air_ranks:
+            branch = AIR_ROLE_HIERARCHY
+            prefix_type = AIR_ROLE_PREFIX
+            await promotion(air_ranks, target, branch, prefix_type,ctx)
+        if armor_ranks:
+            branch = ARMOR_ROLE_HIERARCHY
+            prefix_type = ARMOR_ROLE_PREFIX
+            await promotion(armor_ranks, target, branch, prefix_type,ctx)
 
-                # Get the name of the curent rank and next rank, then search up the coresponding role
-                curent_rank_name = ROLE_HIERARCHY[current_index]
-                next_rank_name = ROLE_HIERARCHY[next_index]
-                curent_role = discord.utils.get(target.guild.roles, name=curent_rank_name)
-                next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
-                # Add the next role (promotion) and remove the cleanup.
-                await target.add_roles(next_role)
-                await target.remove_roles(curent_role)
-
-                # Get the prefix for the current role IE PFC.
-                # Split the current username by the Space inbetween the prefix and nickname, thn replace the prefix.
-                new_prefix = ROLE_PREFIX[next_index]
-                nickname = target.display_name
-                nickname_parts = nickname.split(' ', 1)
-                # nickanme_parts [0] PFC
-                # nickanme_parts[1] User
-                new_nickname = new_prefix + " " +nickname_parts[1]
-                await target.edit(nick=new_nickname)
-                await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name))
     else:
         await ctx.send("You are not authorized to use this command.")
-
-
 
 
 bot.run('MTQwMTU3MTAwMzE0NTkxNjQzNw.GOPDNy.tbh9qsuCJC5GwPzMnG067yWFJoH7VwjgRMK9n8')
