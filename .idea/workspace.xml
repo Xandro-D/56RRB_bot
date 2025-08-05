@@ -64,7 +64,7 @@
       <updated>1754410454773</updated>
       <workItem from="1754410455784" duration="129000" />
       <workItem from="1754412014420" duration="1689000" />
-      <workItem from="1754417662789" duration="3768000" />
+      <workItem from="1754417662789" duration="5030000" />
     </task>
     <servers />
   </component>
@@ -72,6 +72,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/RRB_Bot$bot.coverage" NAME="bot Coverage Results" MODIFIED="1754433369250" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/RRB_Bot$bot.coverage" NAME="bot Coverage Results" MODIFIED="1754434447322" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

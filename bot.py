@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 
-#setup variebles
-
+#setup variables
 
 # ------- Ground gooners --------
 GROUND_ROLE_HIERARCHY = [
@@ -60,7 +59,6 @@ ARMOR_ROLE_PREFIX = [
 
 AUTHORIZED_ROLES = ['Admin',]
 
-
 # Initializing discord bot
 intents = discord.Intents.default()
 intents.message_content = True
@@ -69,12 +67,9 @@ intents.members = True  # Needed to access member roles
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-
-
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
-
 
 # Actually commands
 # docternate @user nick
@@ -83,10 +78,10 @@ async def doc(ctx):
     author = ctx.message.author
     # Get the roles of the suer.
     role_names = [role.name for role in author.roles]
-    # Filter for roles in the HIERACHY
+    # Filter for roles in the HIERARCHY
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
     if user_level:
-        # get the roles for new poeple
+        # get the roles for new people
         role1 = discord.utils.get(ctx.guild.roles, name="Member")
         role2 = discord.utils.get(ctx.guild.roles, name="Waiting for BCT")
         target = ctx.message.mentions[0]
@@ -99,12 +94,11 @@ async def doc(ctx):
     else:
         await ctx.send("You are not authorized to do that.")
 
-
 async def promotion(user_ranks, target, branch, prefix_type,ctx):
     current_index = branch.index(user_ranks[0])
     next_index = current_index + 1
     if next_index < len(branch):
-        # Get the name of the current rank and next rank, then search up the coresponding role
+        # Get the name of the current rank and next rank, then search up the corresponding role
         curent_rank_name = branch[current_index]
         next_rank_name = branch[next_index]
         current_role = discord.utils.get(target.guild.roles, name=curent_rank_name)
@@ -124,8 +118,6 @@ async def promotion(user_ranks, target, branch, prefix_type,ctx):
         await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name))
     else:
         await ctx.send(target.display_name + " is already the highest rank in his/her branch")
-
-
 
 @bot.command()
 # the !promote command
@@ -165,6 +157,16 @@ async def promote(ctx):
 
     else:
         await ctx.send("You are not authorized to use this command.")
-
+@bot.command()
+# the silly fact check command
+async def factcheck(ctx):
+    # First check to see if the sender is an admin and therefore correct
+    author = ctx.author
+    role_names = [role.name for role in author.roles]
+    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
+    if user_level:
+        await ctx.send("You are absolutely correct")
+    else:
+        await ctx.send("You are wrong dipshit.")
 
 bot.run('MTQwMTU3MTAwMzE0NTkxNjQzNw.GOPDNy.tbh9qsuCJC5GwPzMnG067yWFJoH7VwjgRMK9n8')
