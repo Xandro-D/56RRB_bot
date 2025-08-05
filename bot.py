@@ -1,8 +1,5 @@
-# This example requires the 'message_content' intent.
 import discord
-from aiohttp.test_utils import TestClient
 from discord.ext import commands
-from discord import app_commands
 
 #setup variebles
 
@@ -47,7 +44,7 @@ async def doc(ctx):
     role_names = [role.name for role in author.roles]
     # Filter for roles in the HIERACHY
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level is not None:
+    if user_level:
         # get the roles for new poeple
         role1 = discord.utils.get(ctx.guild.roles, name="Member")
         role2 = discord.utils.get(ctx.guild.roles, name="Waiting for BCT")
@@ -73,19 +70,17 @@ async def promote(ctx):
     author = ctx.author
     role_names = [role.name for role in author.roles]
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-
-    print(author)
-    if user_level is not None:
-        # Check who the user mentiont, that is the target.
+    if user_level:
+        # Check who the user mentioned, that is the target.
         target = ctx.message.mentions[0]
         # Get the roles of the suer.
         role_names = [role.name for role in target.roles]
         # Filter for roles in the HIERACHY
         user_ranks = [role for role in ROLE_HIERARCHY if role in role_names]
+
         # Get the index of the rank from the target.
         if user_ranks is not None:
             current_index = ROLE_HIERARCHY.index(user_ranks[0])
-            print(current_index)
             next_index = current_index + 1
             if next_index < len(ROLE_HIERARCHY):
 
@@ -105,11 +100,9 @@ async def promote(ctx):
                 nickname_parts = nickname.split(' ', 1)
                 # nickanme_parts [0] PFC
                 # nickanme_parts[1] User
-                print(nickname_parts)
                 new_nickname = new_prefix + " " +nickname_parts[1]
                 await target.edit(nick=new_nickname)
-                print(new_nickname)
-                await ctx.send("Congrats " + str(target.display_name) + "You got promoted from " + str(curent_rank_name) + " Too " + str(next_rank_name))
+                await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name))
     else:
         await ctx.send("You are not authorized to use this command.")
 
