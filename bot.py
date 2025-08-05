@@ -71,8 +71,11 @@ async def doc(ctx):
 # the !promote command
 async def promote(ctx):
     author = ctx.author
+    role_names = [role.name for role in author.roles]
+    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
+
     print(author)
-    if 1==1:
+    if user_level is not None:
         # Check who the user mentiont, that is the target.
         target = ctx.message.mentions[0]
         # Get the roles of the suer.
