@@ -157,6 +157,21 @@ async def promote(ctx):
 
     else:
         await ctx.send("You are not authorized to use this command.")
+
+
+
+
+positive_reply = [
+    'Our independent analysts at RT and TASS confirms this as true',
+    "Fact checked as true by real american patriots",
+    "The CCP approves this message",
+]
+
+negative_reply = [
+    "Grok tells me this is false",
+    "You are wrong dipshit.",
+    "This is as true as epstein having committed suicide",
+]
 @bot.command()
 # the silly fact check command
 async def factcheck(ctx):
@@ -165,8 +180,51 @@ async def factcheck(ctx):
     role_names = [role.name for role in author.roles]
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
     if user_level:
-        await ctx.send("You are absolutely correct")
+        responds = random.choice()
+        await ctx.send(responds)
     else:
-        await ctx.send("You are wrong dipshit.")
+        responds = random.choice(negative_reply)
+        await ctx.send(responds)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 bot.run('MTQwMTU3MTAwMzE0NTkxNjQzNw.GOPDNy.tbh9qsuCJC5GwPzMnG067yWFJoH7VwjgRMK9n8')
