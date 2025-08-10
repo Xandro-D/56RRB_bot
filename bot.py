@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-import random
 
 #setup variables
 
@@ -31,7 +30,6 @@ NCO_ROLE_HIERARCHY = [
 NCO_ROLE_PREFIX = ['CPL.','SGT.','SSG.','SFC.','MSG.']
 
 # ----- AIR Giga chads ------
-
 AIR_ROLE_HIERARCHY = [
     '[Airman Basic]',
     '[Airman]',
@@ -73,7 +71,7 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
 
 # Actually commands
-# docternate @user nick
+# doctorate @user nick
 @bot.command()
 async def doc(ctx):
     author = ctx.message.author
@@ -104,6 +102,8 @@ async def promotion(user_ranks, target, branch, prefix_type,ctx):
         next_rank_name = branch[next_index]
         current_role = discord.utils.get(target.guild.roles, name=curent_rank_name)
         next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
+        author = ctx.message.author
+        author_name = author.display_name
         # Add the next role (promotion) and remove the cleanup.
         await target.add_roles(next_role)
         await target.remove_roles(current_role)
@@ -112,67 +112,52 @@ async def promotion(user_ranks, target, branch, prefix_type,ctx):
         new_prefix = prefix_type[next_index]
         nickname = target.display_name
         nickname_parts = nickname.split(' ', 1)
-        # nickanme_parts [0] PFC
-        # nickanme_parts[1] User
+        # nickname_parts [0] PFC
+        # nickname_parts[1] User
         new_nickname = new_prefix + " " + nickname_parts[1]
         await target.edit(nick=new_nickname)
-        await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name))
+        await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name) + " by " + author_name)
     else:
         await ctx.send(target.display_name + " is already the highest rank in his/her branch")
 
 @bot.command()
 # the !promote command
 async def promote(ctx):
-    # First check to see if the sender has enough privelge to execurte command
+    # First check to see if the sender has enough privilege to execute command
     author = ctx.author
     role_names = [role.name for role in author.roles]
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
     if user_level:
         # Check who the user mentioned, that is the target.
-        target = ctx.message.mentions[0]
-        # Get the roles of the suer.
-        role_names = [role.name for role in target.roles]
-
-        # Filter for roles in each branch sepperatly
-        user_ranks_ground = [role for role in GROUND_ROLE_HIERARCHY if role in role_names]
-        nco_ranks = [role for role in NCO_ROLE_HIERARCHY if role in role_names]
-        air_ranks = [role for role in AIR_ROLE_HIERARCHY if role in role_names]
-        armor_ranks = [role for role in ARMOR_ROLE_HIERARCHY if role in role_names]
+        targets = ctx.message.mentions
         # If the target is in ground branch call promotion function with branch
-        if user_ranks_ground:
-            branch = GROUND_ROLE_HIERARCHY
-            prefix_type = GROUND_ROLE_PREFIX
-            await promotion(user_ranks_ground, target, branch,prefix_type,ctx)
-        if nco_ranks:
-            branch = NCO_ROLE_HIERARCHY
-            prefix_type = NCO_ROLE_PREFIX
-            await promotion(nco_ranks, target, branch, prefix_type,ctx)
-        if air_ranks:
-            branch = AIR_ROLE_HIERARCHY
-            prefix_type = AIR_ROLE_PREFIX
-            await promotion(air_ranks, target, branch, prefix_type,ctx)
-        if armor_ranks:
-            branch = ARMOR_ROLE_HIERARCHY
-            prefix_type = ARMOR_ROLE_PREFIX
-            await promotion(armor_ranks, target, branch, prefix_type,ctx)
-
+        for target in targets:
+            # Filter for roles in each branch separately
+            # Get the roles of the suer.
+            role_names = [role.name for role in target.roles]
+            user_ranks_ground = [role for role in GROUND_ROLE_HIERARCHY if role in role_names]
+            nco_ranks = [role for role in NCO_ROLE_HIERARCHY if role in role_names]
+            air_ranks = [role for role in AIR_ROLE_HIERARCHY if role in role_names]
+            armor_ranks = [role for role in ARMOR_ROLE_HIERARCHY if role in role_names]
+            if user_ranks_ground:
+                branch = GROUND_ROLE_HIERARCHY
+                prefix_type = GROUND_ROLE_PREFIX
+                await promotion(user_ranks_ground, target, branch,prefix_type,ctx)
+            if nco_ranks:
+                branch = NCO_ROLE_HIERARCHY
+                prefix_type = NCO_ROLE_PREFIX
+                await promotion(nco_ranks, target, branch, prefix_type,ctx)
+            if air_ranks:
+                branch = AIR_ROLE_HIERARCHY
+                prefix_type = AIR_ROLE_PREFIX
+                await promotion(air_ranks, target, branch, prefix_type,ctx)
+            if armor_ranks:
+                branch = ARMOR_ROLE_HIERARCHY
+                prefix_type = ARMOR_ROLE_PREFIX
+                await promotion(armor_ranks, target, branch, prefix_type,ctx)
+        await ctx.message.delete()
     else:
         await ctx.send("You are not authorized to use this command.")
-
-
-
-
-positive_reply = [
-    'Our independent analysts at RT and TASS confirms this as true',
-    "Fact checked as true by real american patriots",
-    "The CCP approves this message",
-]
-
-negative_reply = [
-    "Grok tells me this is false",
-    "You are wrong dipshit.",
-    "This is as true as epstein having committed suicide",
-]
 @bot.command()
 # the silly fact check command
 async def factcheck(ctx):
@@ -181,51 +166,8 @@ async def factcheck(ctx):
     role_names = [role.name for role in author.roles]
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
     if user_level:
-        responds = random.choice()
-        await ctx.send(responds)
+        await ctx.send("You are absolutely correct")
     else:
-        responds = random.choice(negative_reply)
-        await ctx.send(responds)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        await ctx.send("You are wrong dipshit.")
 
 bot.run('MTQwMTU3MTAwMzE0NTkxNjQzNw.GOPDNy.tbh9qsuCJC5GwPzMnG067yWFJoH7VwjgRMK9n8')
