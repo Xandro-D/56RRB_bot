@@ -69,6 +69,18 @@ intents.members = True  # Needed to access member roles
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+async def admin_check(ctx):
+    author = ctx.author
+    role_names = [role.name for role in author.roles]
+    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
+    db.remove_expired_strikes()
+    if user_level:
+        return True
+    else:
+        await ctx.send("You are not authorized to use this command.")
+        return False
+
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
@@ -77,12 +89,7 @@ async def on_ready():
 # doctorate @user nick
 @bot.command()
 async def doc(ctx):
-    author = ctx.message.author
-    # Get the roles of the suer.
-    role_names = [role.name for role in author.roles]
-    # Filter for roles in the HIERARCHY
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level:
+    if await admin_check(ctx):
         # get the roles for new people
         role2 = discord.utils.get(ctx.guild.roles, name="Waiting for BCT")
         target = ctx.message.mentions[0]
@@ -92,9 +99,6 @@ async def doc(ctx):
         await target.add_roles(role2)
         await target.edit(nick=new_nick)
         await ctx.send(new_nick + " has been drafted")
-    else:
-        await ctx.send("You are not authorized to do that.")
-
 # -----------------------------------
 async def promotion(user_ranks, target, branch, prefix_type,ctx):
     current_index = branch.index(user_ranks[0])
@@ -127,10 +131,7 @@ async def promotion(user_ranks, target, branch, prefix_type,ctx):
 # the !promote command
 async def promote(ctx):
     # First check to see if the sender has enough privilege to execute command
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level:
+    if await admin_check(ctx):
         # Check who the user mentioned, that is the target.
         targets = ctx.message.mentions
         # If the target is in ground branch call promotion function with branch
@@ -159,17 +160,11 @@ async def promote(ctx):
                 prefix_type = ARMOR_ROLE_PREFIX
                 await promotion(armor_ranks, target, branch, prefix_type,ctx)
         await ctx.message.delete()
-    else:
-        await ctx.send("You are not authorized to use this command.")
 #         ---------------------------------------------
 @bot.command()
 # the silly fact check command
 async def factcheck(ctx):
-    # First check to see if the sender is an admin and therefore correct
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level:
+    if await admin_check(ctx):
         await ctx.send("You are absolutely correct")
     else:
         await ctx.send("You are wrong dipshit.")
@@ -181,11 +176,7 @@ async def factcheck(ctx):
 # Check if user is admin, if yes continue
 # Get he user_id from each mentioned person and send a strike along side the expire date(how long untill expires) too the b
 async def strike(ctx):
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    db.remove_expired_strikes()
-    if user_level:
+    if await admin_check(ctx):
         targets = ctx.message.mentions
         for target in targets:
             target_user_id = target.id
@@ -193,18 +184,10 @@ async def strike(ctx):
             if db.get_strikes(target_user_id) < 3:
                 await ctx.send(f"{target.display_name} has been struck and now has {db.get_strikes(target_user_id)} strikes.  ")
             else:
-                await ctx.send(f"{target.display_name} has three or more strikes and should be banned get em boys.")
-
-    else:
-        await ctx.send("You are not authorized to use this command.")
-
+                await ctx.send(f"{target.display_name} has three or more strikes and should be banned, get em boys.")
 @bot.command()
 async def remove_strike(ctx):
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    db.remove_expired_strikes()
-    if user_level:
+    if await admin_check(ctx):
         targets = ctx.message.mentions
         for target in targets:
             target_user_id = target.id
@@ -213,33 +196,22 @@ async def remove_strike(ctx):
                 await ctx.send(f"{target.display_name} now has {db.get_strikes(target_user_id)} strikes.")
             else:
                 await ctx.send(f"{target.display_name} has no strikes to remove.")
-    else:
-        await ctx.send("You are not authorized to use this command.")
-
 
 @bot.command()
 # warning command
 # Check for admin privilage, if admin continue
 # for all mention user get user_id and put a warning in the db
 async def warn(ctx):
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level:
+    if await admin_check(ctx):
         targets = ctx.message.mentions
         for target in targets:
             target_user_id = target.id
             db.add_warning(target_user_id,)
             await ctx.send(f"{target.display_name} has been warned.")
-    else:
-        await ctx.send("You are not authorized to use this command.")
 
 @bot.command()
 async def remove_warn(ctx):
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level:
+    if await admin_check(ctx):
         targets = ctx.message.mentions
         for target in targets:
             target_user_id = target.id
@@ -248,8 +220,6 @@ async def remove_warn(ctx):
                 await ctx.send(f"{target.display_name} now has {db.get_warnings(target_user_id)} warnings.")
             else:
                 await ctx.send(f"{target.display_name} has no warnings to remove.")
-        else:
-            await ctx.send("You are not authorized to use this command.")
 
 @bot.command()
 async def info(ctx):
@@ -261,10 +231,7 @@ async def info(ctx):
 
 @bot.command()
 async def reset(ctx):
-    author = ctx.author
-    role_names = [role.name for role in author.roles]
-    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
-    if user_level:
+    if await admin_check(ctx):
         targets = ctx.message.mentions
         for target in targets:
             target_user_id = target.id
