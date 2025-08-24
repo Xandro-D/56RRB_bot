@@ -1,0 +1,20 @@
+!strike @target
+strikes a target adding it to the db
+!remove_strike @target
+removes strike from target
+!warn @target
+warns target adding it to the db
+!remove_warn @target
+Removes warning from target
+
+
+!promote @target
+promotes a target within their own branch
+!demote @target (WIP)
+demotes target within their branch
+
+
+!doc @target nickname
+gives a new player their roles and nickname
+
+
