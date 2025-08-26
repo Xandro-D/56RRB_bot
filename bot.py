@@ -163,8 +163,12 @@ async def promote(ctx):
 #         ---------------------------------------------
 @bot.command()
 # the silly fact check command
-async def factcheck(ctx):
-    if await admin_check(ctx):
+async def admin_check(ctx):
+    author = ctx.author
+    role_names = [role.name for role in author.roles]
+    user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
+    db.remove_expired_strikes()
+    if user_level:
         await ctx.send("You are absolutely correct")
     else:
         await ctx.send("You are wrong dipshit.")
@@ -206,8 +210,13 @@ async def warn(ctx):
         targets = ctx.message.mentions
         for target in targets:
             target_user_id = target.id
-            db.add_warning(target_user_id,)
-            await ctx.send(f"{target.display_name} has been warned.")
+            if db.get_warnings(target_user_id) < 3:
+                db.add_warning(target_user_id,)
+                await ctx.send(f"{target.display_name} has been warned.")
+            else:
+                db.reset_warnings(target_user_id)
+                db.add_strike(target_user_id,15778463)
+                await ctx.send(f"{target.display_name} has 3 or more warnings and has been striked. Now he has {db.get_strikes(target_user_id)} strikes and {db.get_warnings(target_user_id)} warns.")
 
 @bot.command()
 async def remove_warn(ctx):
