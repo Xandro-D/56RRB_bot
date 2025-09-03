@@ -1,65 +1,24 @@
 import discord
 from discord.ext import commands
 from database import ModerationDatabase
+import json
 
 
 db = ModerationDatabase()
 
-#setup variables
-# ------- Ground gooners --------
-GROUND_ROLE_HIERARCHY = [
-    '[Private Third Class]',
-    '[Private Second Class]',
-    '[Private First Class]',
-    '[Specialist Third Class]',
-    '[Specialist Second Class]',
-    '[Specialist First Class]',
-    '[Master Specialist]',
-    '[First Specialist]',
-    '[Specialist Major]'
-]
+with open("hierarchy.json", "r") as f:
+    data = json.load(f)
 
-GROUND_ROLE_PREFIX = ['PV3.', 'PV2.', 'PFC.', 'SP3.', 'SP2.', 'SP1.', 'MSP.', 'FSP.', 'SPM.']
-
-# ------- NCO nerds -------
-NCO_ROLE_HIERARCHY = [
-    '[Corporal]',
-    '[Sergeant]',
-    '[Staff Sergeant]',
-    '[Sergeant First Class]',
-    '[Master Sergeant]'
-]
-
-NCO_ROLE_PREFIX = ['CPL.','SGT.','SSG.','SFC.','MSG.']
-
-# ----- AIR Giga chads ------
-AIR_ROLE_HIERARCHY = [
-    '[Airman Basic]',
-    '[Airman]',
-    '[Airman 1st Class]',
-    '[Airman Specialist]',
-    '[Senior Airman]',
-    '[Staff Sergeаnt]',
-    '[Technical Sergeаnt]',
-    '[Master Sergeаnt]'
-]
-
-AIR_ROLE_PREFIX = ['AMB.','AMN.','AFC.','AMS.','SRA.','SSG.','TSG.','MSG.']
-
-# ------ ARMOR gays -------
-ARMOR_ROLE_HIERARCHY = [
-    '[Crewman]',
-    '[Technical Crewman]',
-    '[Armor Sergeant]',
-    '[Armor Staff Sergeant]',
-    '[Gunnery Sergeant]',
-]
-
-ARMOR_ROLE_PREFIX = [
-    'CMN.','TCMD.','ASGT.','ASSG.','GYSGT.'
-]
-
-AUTHORIZED_ROLES = ['Admin',]
+# assign variebles from json file
+GROUND_ROLE_HIERARCHY = data["GROUND_ROLE_HIERARCHY"]
+GROUND_ROLE_PREFIX = data["GROUND_ROLE_PREFIX"]
+NCO_ROLE_HIERARCHY = data["NCO_ROLE_HIERARCHY"]
+NCO_ROLE_PREFIX = data["NCO_ROLE_PREFIX"]
+AIR_ROLE_HIERARCHY = data["AIR_ROLE_HIERARCHY"]
+AIR_ROLE_PREFIX = data["AIR_ROLE_PREFIX"]
+ARMOR_ROLE_HIERARCHY = data["ARMOR_ROLE_HIERARCHY"]
+ARMOR_ROLE_PREFIX = data["ARMOR_ROLE_PREFIX"]
+AUTHORIZED_ROLES = data["AUTHORIZED_ROLES"]
 
 # Initializing discord bot
 intents = discord.Intents.default()
@@ -163,7 +122,7 @@ async def promote(ctx):
 #         ---------------------------------------------
 @bot.command()
 # the silly fact check command
-async def admin_check(ctx):
+async def factcheck(ctx):
     author = ctx.author
     role_names = [role.name for role in author.roles]
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
@@ -247,4 +206,9 @@ async def reset(ctx):
             db.reset_strikes(target_user_id)
             db.reset_warnings(target.id)
             await ctx.send(f"{target.display_name} has been reset.")
+
+@bot.event
+async def on_command_error(ctx, error):
+    await ctx.reply(f"An error occurred:\n```{error}```")
+
 bot.run('MTQwOTEyNTgxMDM3MTI5NzMxNQ.GEHqA4.OaPQOqb6lT6qAIaGenU7ChjuWZ8uNNYLaCjiU8')

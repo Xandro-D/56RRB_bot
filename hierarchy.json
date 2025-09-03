@@ -1,0 +1,75 @@
+{
+  "GROUND_ROLE_HIERARCHY": [
+    "[Private Third Class]",
+    "[Private Second Class]",
+    "[Private First Class]",
+    "[Specialist Third Class]",
+    "[Specialist Second Class]",
+    "[Specialist First Class]",
+    "[Master Specialist]",
+    "[First Specialist]",
+    "[Specialist Major]"
+  ],
+  "GROUND_ROLE_PREFIX": [
+    "PV3.",
+    "PV2.",
+    "PFC.",
+    "SP3.",
+    "SP2.",
+    "SP1.",
+    "MSP.",
+    "FSP.",
+    "SPM."
+  ],
+  "NCO_ROLE_HIERARCHY": [
+    "[Corporal]",
+    "[Sergeant]",
+    "[Staff Sergeant]",
+    "[Sergeant First Class]",
+    "[Master Sergeant]"
+  ],
+  "NCO_ROLE_PREFIX": [
+    "CPL.",
+    "SGT.",
+    "SSG.",
+    "SFC.",
+    "MSG."
+  ],
+  "AIR_ROLE_HIERARCHY": [
+    "[Airman Basic]",
+    "[Airman]",
+    "[Airman 1st Class]",
+    "[Airman Specialist]",
+    "[Senior Airman]",
+    "[Staff Sergeant]",
+    "[Technical Sergeant]",
+    "[Master Sergeant]"
+  ],
+  "AIR_ROLE_PREFIX": [
+    "AMB.",
+    "AMN.",
+    "AFC.",
+    "AMS.",
+    "SRA.",
+    "SSG.",
+    "TSG.",
+    "MSG."
+  ],
+  "ARMOR_ROLE_HIERARCHY": [
+    "[Crewman]",
+    "[Technical Crewman]",
+    "[Armor Sergeant]",
+    "[Armor Staff Sergeant]",
+    "[Gunnery Sergeant]"
+  ],
+  "ARMOR_ROLE_PREFIX": [
+    "CMN.",
+    "TCMD.",
+    "ASGT.",
+    "ASSG.",
+    "GYSGT."
+  ],
+  "AUTHORIZED_ROLES": [
+    "Admin"
+  ]
+}
