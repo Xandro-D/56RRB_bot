@@ -71,5 +71,18 @@
   ],
   "AUTHORIZED_ROLES": [
     "Admin"
+  ],
+  "SILLY_FACT_CHECK_POSITIVE": [
+    "Grok has fact checked this message and it is true.",
+    "The CCP approves this message.",
+    "If you think this isn't true, then you should seek medical advice from a professional",
+    "I don't feel like checking this one, do it yourself.",
+    "This is absolutely correct."
+  ],
+  "SILLY_FACT_CHECK_NEGATIVE":[
+    "I have looked into this matter and you are undoubtedly a little stupid.",
+    "Please, think.",
+    "Wrong, just you're wrong.",
+    "I'm not even gonna try the answer is just so obvious."
   ]
 }
