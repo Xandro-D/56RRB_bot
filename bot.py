@@ -1,3 +1,5 @@
+import random
+
 import discord
 from discord.ext import commands
 from database import ModerationDatabase
@@ -9,7 +11,7 @@ db = ModerationDatabase()
 with open("hierarchy.json", "r") as f:
     data = json.load(f)
 
-# assign variebles from json file
+# assign variables from json file
 GROUND_ROLE_HIERARCHY = data["GROUND_ROLE_HIERARCHY"]
 GROUND_ROLE_PREFIX = data["GROUND_ROLE_PREFIX"]
 NCO_ROLE_HIERARCHY = data["NCO_ROLE_HIERARCHY"]
@@ -19,6 +21,8 @@ AIR_ROLE_PREFIX = data["AIR_ROLE_PREFIX"]
 ARMOR_ROLE_HIERARCHY = data["ARMOR_ROLE_HIERARCHY"]
 ARMOR_ROLE_PREFIX = data["ARMOR_ROLE_PREFIX"]
 AUTHORIZED_ROLES = data["AUTHORIZED_ROLES"]
+SILLY_FACT_CHECK_POSITIVE = data["SILLY_FACT_CHECK_POSITIVE"]
+SILLY_FACT_CHECK_NEGATIVE = data["SILLY_FACT_CHECK_NEGATIVE"]
 
 # Initializing discord bot
 intents = discord.Intents.default()
@@ -64,9 +68,9 @@ async def promotion(user_ranks, target, branch, prefix_type,ctx):
     next_index = current_index + 1
     if next_index < len(branch):
         # Get the name of the current rank and next rank, then search up the corresponding role
-        curent_rank_name = branch[current_index]
+        current_rank_name = branch[current_index]
         next_rank_name = branch[next_index]
-        current_role = discord.utils.get(target.guild.roles, name=curent_rank_name)
+        current_role = discord.utils.get(target.guild.roles, name=current_rank_name)
         next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
         author = ctx.message.author
         author_name = author.display_name
@@ -82,7 +86,7 @@ async def promotion(user_ranks, target, branch, prefix_type,ctx):
         # nickname_parts[1] User
         new_nickname = new_prefix + " " + nickname_parts[1]
         await target.edit(nick=new_nickname)
-        await ctx.send("Congrats " + str(target.display_name) + " you got promoted from " + str(curent_rank_name) + " to " + str(next_rank_name) + " by " + author_name)
+        await ctx.send("Congrats " + target.mention + " you got promoted from " + str(current_rank_name) + " to " + str(next_rank_name) + " by " + author_name)
     else:
         await ctx.send(target.display_name + " is already the highest rank in his/her branch")
 
@@ -128,16 +132,15 @@ async def factcheck(ctx):
     user_level = [role for role in AUTHORIZED_ROLES if role in role_names]
     db.remove_expired_strikes()
     if user_level:
-        await ctx.send("You are absolutely correct")
+        await ctx.send(random.choice(SILLY_FACT_CHECK_POSITIVE))
     else:
-        await ctx.send("You are wrong dipshit.")
-
+        await ctx.send(random.choice(SILLY_FACT_CHECK_NEGATIVE))
 #           ------------------------------------------
 
 @bot.command()
 #The strike command
 # Check if user is admin, if yes continue
-# Get he user_id from each mentioned person and send a strike along side the expire date(how long untill expires) too the b
+# Get he user_id from each mentioned person and send a strike alongside the expire date(how long until expires) to the db
 async def strike(ctx):
     if await admin_check(ctx):
         targets = ctx.message.mentions
@@ -162,7 +165,7 @@ async def remove_strike(ctx):
 
 @bot.command()
 # warning command
-# Check for admin privilage, if admin continue
+# Check for admin privilege, if admin continue
 # for all mention user get user_id and put a warning in the db
 async def warn(ctx):
     if await admin_check(ctx):
@@ -175,7 +178,7 @@ async def warn(ctx):
             else:
                 db.reset_warnings(target_user_id)
                 db.add_strike(target_user_id,15778463)
-                await ctx.send(f"{target.display_name} has 3 or more warnings and has been striked. Now he has {db.get_strikes(target_user_id)} strikes and {db.get_warnings(target_user_id)} warns.")
+                await ctx.send(f"{target.display_name} has 3 or more warnings and has been struck. Now he has {db.get_strikes(target_user_id)} strikes and {db.get_warnings(target_user_id)} warns.")
 
 @bot.command()
 async def remove_warn(ctx):
