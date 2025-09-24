@@ -194,7 +194,7 @@ async def remove_strike(interaction,target:discord.Member):
     await interaction.response.send_message(f"{target.display_name} has {strikes} strikes and {warnings} warnings.")
 
 
-@client.tree.command(name="reset",description="Resets a persons srikes and warns")
+@client.tree.command(name="reset",description="Resets a persons strikes and warns")
 async def remove_strike(interaction,target:discord.Member):
     if await admin_check(interaction):
         db.reset_strikes(target.id)
@@ -204,9 +204,9 @@ async def remove_strike(interaction,target:discord.Member):
 @client.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     if isinstance(error, app_commands.CommandInvokeError):
-        await interaction.response.send_message("❌ Something went wrong in the command.", ephemeral=True)
+        await interaction.response.send_message("Something went wrong in the command.", ephemeral=True)
     else:
-        await interaction.response.send_message(f"⚠️ Error: {error}", ephemeral=True)
+        await interaction.response.send_message(f"Error: {error}", ephemeral=True)
 
 
 
