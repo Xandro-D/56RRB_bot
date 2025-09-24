@@ -49,6 +49,7 @@ class MyClient(discord.Client):
 #     async def setup_hook(self):
 #         # Sync commands with Discord
 #         await self.tree.sync()
+
 client = MyClient()
 
 
@@ -142,7 +143,70 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
     else:
         await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
 
+# End of promotion command
 
+# Start of moderation commands
+# Strike command
+@client.tree.command(name="strike",description="Strike a person, strikes last 6 months.")
+async def strike(interaction,target:discord.Member):
+    if await admin_check(interaction):
+        db.add_strike(target.id, 15778463)
+        if db.get_strikes(target.id) < 3:
+            await interaction.response.send_message(f"{target.display_name} has been struck and now has {db.get_strikes(target.id)} strikes.  ")
+        else:
+            await interaction.response.send_message(f"{target.display_name} has three or more strikes and should be banned, get em boys.")
+
+@client.tree.command(name="remove_strike",description="Removes 1 strike from a person")
+async def remove_strike(interaction,target:discord.Member):
+    if await admin_check(interaction):
+        if db.get_strikes(target.id) > 0:
+            db.remove_strike(target.id)
+            await interaction.response.send_message(f"{target.display_name} now has {db.get_strikes(target.id)} strikes.")
+        else:
+            await (interaction.response.send_message(f"{target.display_name} has no strikes to remove."))
+# End of strike commands
+# Warn commands
+@client.tree.command(name="warn",description="Gives 1 warning to a person, warnings last until a strike.")
+async def remove_strike(interaction,target:discord.Member):
+    if await admin_check(interaction):
+        if db.get_warnings(target.id) < 2:
+            db.add_warning(target.id, )
+            await interaction.response.send_message(f"{target.display_name} has been warned.")
+        else:
+            db.reset_warnings(target.id)
+            db.add_strike(target.id, 15778463)
+            await interaction.response.send_message(f"{target.display_name} has 2 or more warnings and has been struck. Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns.")
+
+@client.tree.command(name="remove_warn",description="Removes 1 warning from a person.")
+async def remove_strike(interaction,target:discord.Member):
+    if await admin_check(interaction):
+        if db.get_warnings(target.id) > 0:
+            db.remove_warning(target.id)
+            await interaction.response.send_message(f"{target.display_name} now has {db.get_warnings(target.id)} warnings.")
+        else:
+            await interaction.response.send_message(f"{target.display_name} has no warnings to remove.")
+
+
+@client.tree.command(name="info",description="displays")
+async def remove_strike(interaction,target:discord.Member):
+    strikes = db.get_strikes(target.id)
+    warnings = db.get_warnings(target.id)
+    await interaction.response.send_message(f"{target.display_name} has {strikes} strikes and {warnings} warnings.")
+
+
+@client.tree.command(name="reset",description="Resets a persons srikes and warns")
+async def remove_strike(interaction,target:discord.Member):
+    if await admin_check(interaction):
+        db.reset_strikes(target.id)
+        db.reset_warnings(target.id)
+        await interaction.response.send_message(f"{target.display_name} has been reset.")
+
+@client.tree.error
+async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    if isinstance(error, app_commands.CommandInvokeError):
+        await interaction.response.send_message("❌ Something went wrong in the command.", ephemeral=True)
+    else:
+        await interaction.response.send_message(f"⚠️ Error: {error}", ephemeral=True)
 
 
 

@@ -5,11 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/RRB_Bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/RRB_Bot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hierarchy.json" beforeDir="false" afterPath="$PROJECT_DIR$/hierarchy.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/moderation.db" beforeDir="false" afterPath="$PROJECT_DIR$/moderation.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +59,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "bot-with-",
+    "ignore.virus.scanning.warn.message": "true",
     "last_opened_file_path": "/Users/xandro/PycharmProjects/RRB_Bot",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
