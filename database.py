@@ -1,6 +1,7 @@
 import sqlite3
 import time
 
+
 class ModerationDatabase:
     def __init__(self, db_path="moderation.db"):
         self.conn = sqlite3.connect(db_path)
@@ -65,7 +66,6 @@ class ModerationDatabase:
         expires_at = int(time.time()) + duration_seconds
         self.cursor.execute("INSERT INTO strikes (user_id, expires_at) VALUES (?, ?)", (user_id, expires_at))
         self.conn.commit()
-
 
     def remove_strike(self, user_id: int):
         self.remove_expired_strikes()
