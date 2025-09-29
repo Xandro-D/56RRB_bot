@@ -38,6 +38,7 @@ PREFIX = "!"
 
 GUILD_ID = os.getenv("DISCORD_GUILD_ID")
 bot_token = os.getenv("DISCORD_BOT_TOKEN")
+discord_msg_id = int(os.getenv("DISCORD_MSG_ID"))
 
 
 # ---------- Client Subclass ----------
@@ -241,9 +242,11 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     db.remove_expired_role_cooldown()
+    print(type(payload.message_id),payload.message_id,type(discord_msg_id)  ,discord_msg_id)
+
     if payload.message_id == client.user.id:
         return
-    if payload.message_id == 1422254090322182144:
+    if payload.message_id == discord_msg_id:
         cooldown = db.get_role_cooldown(payload.user_id)
         cooldown_time = db.get_role_cooldown_remaining(payload.user_id)
         print(cooldown_time)
