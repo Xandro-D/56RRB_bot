@@ -242,8 +242,6 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     db.remove_expired_role_cooldown()
-    print(type(payload.message_id),payload.message_id,type(discord_msg_id)  ,discord_msg_id)
-
     if payload.message_id == client.user.id:
         return
     if payload.message_id == discord_msg_id:
@@ -256,17 +254,17 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         user = payload.member
         user_roles = user.roles
         if cooldown:
-            await channel.send(f"{user.mention} is on cooldown for {cooldown_time} seconds",delete_after=5)
+            await channel.send(f"{user.mention} is on cooldown for {cooldown_time} seconds",delete_after=30)
             await message.remove_reaction(payload.emoji, user)
         else:
-            target_names = {"Charlie", "Bravo"}  # prefer a set for O(1) lookups
+            target_names = {"charlie squadmember", "bravo squadmember"}  # prefer a set for O(1) lookups
             roles_to_remove = [r for r in user.roles if r.name in target_names]
             if roles_to_remove:
                 try:
                     await user.remove_roles(*roles_to_remove, reason="Auto removal of disallowed roles")
-                    await channel.send(f"You had the {roles_to_remove} role so it has been removed", delete_after=5)
+                    await channel.send(f"You had the role: {' and '.join(r.name for r in roles_to_remove)} and it got removed", delete_after=30)
                 except discord.Forbidden:
-                    print("Missing permissions or role hierarchy issue.")
+                    await channel.send("Error: Missing permissions or role hierarchy issue.")
             if payload.emoji.name == "🟩":
                 role = discord.utils.get(user.guild.roles, name="charlie squadmember")
                 await user.add_roles(role)
@@ -274,7 +272,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 role = discord.utils.get(user.guild.roles, name="bravo squadmember")
                 await user.add_roles(role)
             await message.remove_reaction(payload.emoji, user)
-            await channel.send(f"{user.mention} has been assigned to {role}", delete_after=5)
-            db.add_role_cooldown(payload.user_id, 20)
+            await channel.send(f"{user.mention} has been assigned to {role}", delete_after=30)
+            db.add_role_cooldown(payload.user_id, 7*24*60*60)
 
 client.run(bot_token)
