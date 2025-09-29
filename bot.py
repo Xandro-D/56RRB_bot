@@ -1,6 +1,6 @@
 import random
+import os
 import discord
-from attr.filters import exclude
 from discord import app_commands
 from database import ModerationDatabase
 import json
@@ -32,14 +32,18 @@ intents.members = True  # Needed to access member roles
 
 # !!!!!! FOR TESTING, CHANGE WHEN UPLOADING TO ORANGEPI !!!!
 GUILD_ID = 1401612201596555285
+
+
 class MyClient(discord.Client):
     def __init__(self):
         super().__init__(intents=discord.Intents.default())
         self.tree = app_commands.CommandTree(self)
+
     async def setup_hook(self):
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
+
 
 # Subclassing commands.Bot to register slash commands
 # class MyClient(discord.Client):
@@ -64,7 +68,9 @@ async def admin_check(interaction):
         return False
 
 # Silly fact check commands, checks if user has an authorized role and response positively if they do.
-@client.tree.command(name="factcheck",description="The silly factcheck, totally fair and all knowing.")
+
+
+@client.tree.command(name="factcheck", description="The silly factcheck, totally fair and all knowing.")
 async def factcheck(interaction: discord.Interaction):
     author = interaction.user
     # Check if they have a role named "Admin"
@@ -75,10 +81,11 @@ async def factcheck(interaction: discord.Interaction):
 
 # Start of the promote command
 
-@client.tree.command(name="promote",description="Promotes users mentioned in the arguments.")
+
+@client.tree.command(name="promote", description="Promotes users mentioned in the arguments.")
 async def promote(
         interaction: discord.Interaction,
-        target1: discord.Member ,
+        target1: discord.Member,
         target2: discord.Member = None,
         target3: discord.Member = None,
         target4: discord.Member = None,
@@ -90,7 +97,7 @@ async def promote(
         target10: discord.Member = None
 ):
     await interaction.response.defer()
-    targets_unfiltered = [target1,target2,target3,target4,target5,target6,target7,target7,target8,target9,target10]
+    targets_unfiltered = [target1, target2, target3, target4, target5, target6, target7, target8, target9, target10]
     targets = [t for t in targets_unfiltered if t is not None]
     if await admin_check(interaction):
         for target in targets:
@@ -102,20 +109,21 @@ async def promote(
             if user_ranks_ground:
                 branch = GROUND_ROLE_HIERARCHY
                 prefix_type = GROUND_ROLE_PREFIX
-                await promotion(user_ranks_ground, target, branch,prefix_type,interaction)
+                await promotion(user_ranks_ground, target, branch, prefix_type, interaction)
             if nco_ranks:
                 branch = NCO_ROLE_HIERARCHY
                 prefix_type = NCO_ROLE_PREFIX
-                await promotion(nco_ranks, target, branch, prefix_type,interaction)
+                await promotion(nco_ranks, target, branch, prefix_type, interaction)
             if air_ranks:
                 branch = AIR_ROLE_HIERARCHY
                 prefix_type = AIR_ROLE_PREFIX
-                await promotion(air_ranks, target, branch, prefix_type,interaction)
+                await promotion(air_ranks, target, branch, prefix_type, interaction)
             if armor_ranks:
                 branch = ARMOR_ROLE_HIERARCHY
                 prefix_type = ARMOR_ROLE_PREFIX
-                await promotion(armor_ranks, target, branch, prefix_type,interaction)
+                await promotion(armor_ranks, target, branch, prefix_type, interaction)
         await interaction.followup.send("I am done :)")
+
 
 async def promotion(ranks, target, branch, prefix_type, interaction):
     current_index = branch.index(ranks[0])
@@ -139,7 +147,10 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
         # nickname_parts[1] User
         new_nickname = new_prefix + " " + nickname_parts[1]
         await target.edit(nick=new_nickname)
-        await interaction.channel.send("Congrats " + target.mention + " you got promoted from " + str(current_rank_name) + " to " + str(next_rank_name) + " by " + author.mention)
+        await interaction.channel.send(
+            "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
+            " to " + str(next_rank_name) + " by " + author.mention
+        )
     else:
         await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
 
@@ -147,59 +158,80 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
 
 # Start of moderation commands
 # Strike command
-@client.tree.command(name="strike",description="Strike a person, strikes last 6 months.")
-async def strike(interaction,target:discord.Member):
+
+
+@client.tree.command(name="strike", description="Strike a person, strikes last 6 months.")
+async def strike(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
         db.add_strike(target.id, 15778463)
         if db.get_strikes(target.id) < 3:
-            await interaction.response.send_message(f"{target.display_name} has been struck and now has {db.get_strikes(target.id)} strikes.  ")
+            await interaction.response.send_message(
+                f"{target.display_name} has been struck and now has {db.get_strikes(target.id)} strikes."
+            )
         else:
-            await interaction.response.send_message(f"{target.display_name} has three or more strikes and should be banned, get em boys.")
+            await interaction.response.send_message(
+                f"{target.display_name} has three or more strikes and should be banned, get em boys."
+            )
 
-@client.tree.command(name="remove_strike",description="Removes 1 strike from a person")
-async def remove_strike(interaction,target:discord.Member):
+
+@client.tree.command(name="remove_strike", description="Removes 1 strike from a person")
+async def remove_strike(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
         if db.get_strikes(target.id) > 0:
             db.remove_strike(target.id)
-            await interaction.response.send_message(f"{target.display_name} now has {db.get_strikes(target.id)} strikes.")
+            await interaction.response.send_message(
+                f"{target.display_name} now has {db.get_strikes(target.id)} strikes."
+            )
         else:
-            await (interaction.response.send_message(f"{target.display_name} has no strikes to remove."))
+            await interaction.response.send_message(
+                f"{target.display_name} has no strikes to remove."
+            )
 # End of strike commands
 # Warn commands
-@client.tree.command(name="warn",description="Gives 1 warning to a person, warnings last until a strike.")
-async def remove_strike(interaction,target:discord.Member):
+
+
+@client.tree.command(name="warn", description="Gives 1 warning to a person, warnings last until a strike.")
+async def warn(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
         if db.get_warnings(target.id) < 2:
-            db.add_warning(target.id, )
+            db.add_warning(target.id)
             await interaction.response.send_message(f"{target.display_name} has been warned.")
         else:
             db.reset_warnings(target.id)
             db.add_strike(target.id, 15778463)
-            await interaction.response.send_message(f"{target.display_name} has 2 or more warnings and has been struck. Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns.")
+            message = (f"{target.display_name} has 2 or more warnings and has been struck. "
+                       f"Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns.")
+            await interaction.response.send_message(message)
 
-@client.tree.command(name="remove_warn",description="Removes 1 warning from a person.")
-async def remove_strike(interaction,target:discord.Member):
+
+@client.tree.command(name="remove_warn", description="Removes 1 warning from a person.")
+async def remove_warn(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
         if db.get_warnings(target.id) > 0:
             db.remove_warning(target.id)
-            await interaction.response.send_message(f"{target.display_name} now has {db.get_warnings(target.id)} warnings.")
+            await interaction.response.send_message(
+                f"{target.display_name} now has {db.get_warnings(target.id)} warnings."
+            )
         else:
-            await interaction.response.send_message(f"{target.display_name} has no warnings to remove.")
+            await interaction.response.send_message(
+                f"{target.display_name} has no warnings to remove."
+            )
 
 
-@client.tree.command(name="info",description="displays")
-async def remove_strike(interaction,target:discord.Member):
+@client.tree.command(name="info", description="displays")
+async def info(interaction: discord.Interaction, target: discord.Member):
     strikes = db.get_strikes(target.id)
     warnings = db.get_warnings(target.id)
     await interaction.response.send_message(f"{target.display_name} has {strikes} strikes and {warnings} warnings.")
 
 
-@client.tree.command(name="reset",description="Resets a persons strikes and warns")
-async def remove_strike(interaction,target:discord.Member):
+@client.tree.command(name="reset", description="Resets a persons strikes and warns")
+async def reset(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
         db.reset_strikes(target.id)
         db.reset_warnings(target.id)
         await interaction.response.send_message(f"{target.display_name} has been reset.")
+
 
 @client.tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
@@ -209,5 +241,11 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         await interaction.response.send_message(f"Error: {error}", ephemeral=True)
 
 
+# Get bot token from environment variable for security
+bot_token = os.getenv('DISCORD_BOT_TOKEN')
+if not bot_token:
+    print("Error: DISCORD_BOT_TOKEN environment variable not set!")
+    print("Please set your bot token as an environment variable before running the bot.")
+    exit(1)
 
-client.run('MTQwOTEyNTgxMDM3MTI5NzMxNQ.GEHqA4.OaPQOqb6lT6qAIaGenU7ChjuWZ8uNNYLaCjiU8')
+client.run(bot_token)
