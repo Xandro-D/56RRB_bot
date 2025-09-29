@@ -268,10 +268,10 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 except discord.Forbidden:
                     print("Missing permissions or role hierarchy issue.")
             if payload.emoji.name == "🟩":
-                role = discord.utils.get(user.guild.roles, name="Charlie")
+                role = discord.utils.get(user.guild.roles, name="charlie squadmember")
                 await user.add_roles(role)
             elif payload.emoji.name == "🟦":
-                role = discord.utils.get(user.guild.roles, name="Bravo")
+                role = discord.utils.get(user.guild.roles, name="bravo squadmember")
                 await user.add_roles(role)
             await message.remove_reaction(payload.emoji, user)
             await channel.send(f"{user.mention} has been assigned to {role}", delete_after=5)
