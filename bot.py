@@ -1,9 +1,13 @@
 import random
 import os
 import discord
+from aiohttp import payload
 from discord import app_commands
+from pyexpat.errors import messages
+
 from database import ModerationDatabase
 import json
+from dotenv import load_dotenv
 
 
 db = ModerationDatabase()
@@ -25,34 +29,29 @@ SILLY_FACT_CHECK_POSITIVE = data["SILLY_FACT_CHECK_POSITIVE"]
 SILLY_FACT_CHECK_NEGATIVE = data["SILLY_FACT_CHECK_NEGATIVE"]
 
 # Initializing discord bot
+load_dotenv()
 intents = discord.Intents.default()
 intents.message_content = True
 intents.guilds = True
 intents.members = True  # Needed to access member roles
+PREFIX = "!"
 
-# !!!!!! FOR TESTING, CHANGE WHEN UPLOADING TO ORANGEPI !!!!
-GUILD_ID = 1401612201596555285
+GUILD_ID = os.getenv("DISCORD_GUILD_ID")
+bot_token = os.getenv("DISCORD_BOT_TOKEN")
 
 
+# ---------- Client Subclass ----------
 class MyClient(discord.Client):
     def __init__(self):
-        super().__init__(intents=discord.Intents.default())
+        super().__init__(intents=intents)
         self.tree = app_commands.CommandTree(self)
 
     async def setup_hook(self):
+        # Sync slash commands to a specific guild for quick iteration
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
 
-
-# Subclassing commands.Bot to register slash commands
-# class MyClient(discord.Client):
-#     def __init__(self):
-#         super().__init__(intents=discord.Intents.default())
-#         self.tree = app_commands.CommandTree(self)
-#     async def setup_hook(self):
-#         # Sync commands with Discord
-#         await self.tree.sync()
 
 client = MyClient()
 
@@ -239,13 +238,40 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         await interaction.response.send_message("Something went wrong in the command.", ephemeral=True)
     else:
         await interaction.response.send_message(f"Error: {error}", ephemeral=True)
-
-
-# Get bot token from environment variable for security
-bot_token = os.getenv('DISCORD_BOT_TOKEN')
-if not bot_token:
-    print("Error: DISCORD_BOT_TOKEN environment variable not set!")
-    print("Please set your bot token as an environment variable before running the bot.")
-    exit(1)
+@client.event
+async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+    db.remove_expired_role_cooldown()
+    if payload.message_id == client.user.id:
+        return
+    if payload.message_id == 1422254090322182144:
+        cooldown = db.get_role_cooldown(payload.user_id)
+        cooldown_time = db.get_role_cooldown_remaining(payload.user_id)
+        print(cooldown_time)
+        guild = client.get_guild(payload.guild_id)
+        channel = guild.get_channel(payload.channel_id) or await guild.fetch_channel(payload.channel_id)
+        message = await channel.fetch_message(payload.message_id)
+        user = payload.member
+        user_roles = user.roles
+        if cooldown:
+            await channel.send(f"{user.mention} is on cooldown for {cooldown_time} seconds",delete_after=5)
+            await message.remove_reaction(payload.emoji, user)
+        else:
+            target_names = {"Charlie", "Bravo"}  # prefer a set for O(1) lookups
+            roles_to_remove = [r for r in user.roles if r.name in target_names]
+            if roles_to_remove:
+                try:
+                    await user.remove_roles(*roles_to_remove, reason="Auto removal of disallowed roles")
+                    await channel.send(f"You had the {roles_to_remove} role so it has been removed", delete_after=5)
+                except discord.Forbidden:
+                    print("Missing permissions or role hierarchy issue.")
+            if payload.emoji.name == "🟩":
+                role = discord.utils.get(user.guild.roles, name="Charlie")
+                await user.add_roles(role)
+            elif payload.emoji.name == "🟦":
+                role = discord.utils.get(user.guild.roles, name="Bravo")
+                await user.add_roles(role)
+            await message.remove_reaction(payload.emoji, user)
+            await channel.send(f"{user.mention} has been assigned to {role}", delete_after=5)
+            db.add_role_cooldown(payload.user_id, 20)
 
 client.run(bot_token)
