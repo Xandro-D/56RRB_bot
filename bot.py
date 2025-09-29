@@ -1,10 +1,8 @@
 import random
 import os
+import datetime
 import discord
-from aiohttp import payload
 from discord import app_commands
-from pyexpat.errors import messages
-
 from database import ModerationDatabase
 import json
 from dotenv import load_dotenv
@@ -254,7 +252,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         user = payload.member
         user_roles = user.roles
         if cooldown:
-            await channel.send(f"{user.mention} is on cooldown for {cooldown_time} seconds",delete_after=30)
+            await channel.send(f"{user.mention} is on cooldown for {str(datetime.timedelta(seconds=cooldown_time))} seconds",delete_after=30)
             await message.remove_reaction(payload.emoji, user)
         else:
             target_names = {"charlie squadmember", "bravo squadmember"}  # prefer a set for O(1) lookups
