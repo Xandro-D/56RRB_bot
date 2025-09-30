@@ -90,5 +90,10 @@
     "Could not have phrased it better myself.",
     "Stop joking.",
     "Factcheck initiated..."
-  ]
+  ],
+  "ROLE_DICTIONARY": {
+    "\ud83d\udfe9": "charlie squadmember",
+    "\ud83d\udfe6": "bravo squadmember",
+    "\u2b1c": "reset"
+  }
 }

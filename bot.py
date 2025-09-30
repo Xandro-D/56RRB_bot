@@ -2,7 +2,9 @@ import random
 import os
 import datetime
 import discord
-from discord import app_commands
+from discord import (app_commands)
+from pyexpat.errors import messages
+
 from database import ModerationDatabase
 import json
 from dotenv import load_dotenv
@@ -25,6 +27,7 @@ ARMOR_ROLE_PREFIX = data["ARMOR_ROLE_PREFIX"]
 AUTHORIZED_ROLES = data["AUTHORIZED_ROLES"]
 SILLY_FACT_CHECK_POSITIVE = data["SILLY_FACT_CHECK_POSITIVE"]
 SILLY_FACT_CHECK_NEGATIVE = data["SILLY_FACT_CHECK_NEGATIVE"]
+ROLE_DICTIONARY = data["ROLE_DICTIONARY"]
 
 # Initializing discord bot
 load_dotenv()
@@ -37,6 +40,7 @@ PREFIX = "!"
 GUILD_ID = os.getenv("DISCORD_GUILD_ID")
 bot_token = os.getenv("DISCORD_BOT_TOKEN")
 discord_msg_id = int(os.getenv("DISCORD_MSG_ID"))
+discord_channel_id = int(os.getenv("DISCORD_CHANNEL_ID"))
 
 
 # ---------- Client Subclass ----------
@@ -51,9 +55,7 @@ class MyClient(discord.Client):
         self.tree.copy_global_to(guild=guild)
         await self.tree.sync(guild=guild)
 
-
 client = MyClient()
-
 
 # Admin check, check if user has any roles in the authorized roles list
 async def admin_check(interaction):
@@ -237,40 +239,69 @@ async def on_app_command_error(interaction: discord.Interaction, error: app_comm
         await interaction.response.send_message("Something went wrong in the command.", ephemeral=True)
     else:
         await interaction.response.send_message(f"Error: {error}", ephemeral=True)
+
+#         Start of bot reaction role assignment
+# Make the bot react wth all listened to reaction on read
+@client.event
+async def on_ready():
+    print(f"Logged in")
+    channel = await client.fetch_channel(discord_channel_id)
+    message = await channel.fetch_message(discord_msg_id)
+    reactions = ROLE_DICTIONARY.keys()
+    for reaction in reactions:
+        await message.add_reaction(reaction)
+
+
+# The actual role assignment
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     db.remove_expired_role_cooldown()
-    if payload.message_id == client.user.id:
+    if payload.user_id == client.user.id:
         return
     if payload.message_id == discord_msg_id:
         cooldown = db.get_role_cooldown(payload.user_id)
         cooldown_time = db.get_role_cooldown_remaining(payload.user_id)
-        print(cooldown_time)
         guild = client.get_guild(payload.guild_id)
         channel = guild.get_channel(payload.channel_id) or await guild.fetch_channel(payload.channel_id)
         message = await channel.fetch_message(payload.message_id)
+        role_dictionary_values =  ROLE_DICTIONARY.values()
+        role_name_to_assign = ROLE_DICTIONARY.get(str(payload.emoji))
         user = payload.member
-        user_roles = user.roles
+        await message.remove_reaction(payload.emoji, user)
+
+        # Check of the user is on cooldown, if yes send msg and stop
         if cooldown:
             await channel.send(f"{user.mention} is on cooldown for {str(datetime.timedelta(seconds=cooldown_time))} seconds",delete_after=30)
             await message.remove_reaction(payload.emoji, user)
         else:
-            target_names = {"charlie squadmember", "bravo squadmember"}  # prefer a set for O(1) lookups
-            roles_to_remove = [r for r in user.roles if r.name in target_names]
-            if roles_to_remove:
+            # Check if the emote that was reacted is one we track
+            if str(payload.emoji) not in ROLE_DICTIONARY:
+                return
+            # Is the value of the emote == reset, reset the person and let them know.
+            if  role_name_to_assign == "reset":
+                roles_to_remove = [v for v in ROLE_DICTIONARY.values() if v != "reset"]
+                for role_name in roles_to_remove:
+                    role_to_remove = discord.utils.get(user.guild.roles, name=role_name)
+                    await channel.send(f"{user.mention} rest and {role_to_remove} was removed.", delete_after=30)
+                    await user.remove_roles(role_to_remove)
+            # The value isn't reset so its a role we want to assign
+            # We must make sure the user only has 1 of the roles in the list at a time (no charlie and bravo at the same time)
+            # If the user has a role that isn't the one they requested and is also in the dictiary, remove it first
+            else:
+                role_to_assign = discord.utils.get(user.guild.roles, name=role_name_to_assign)
+                role_names = [role.name for role in user.roles]
                 try:
-                    await user.remove_roles(*roles_to_remove, reason="Auto removal of disallowed roles")
-                    await channel.send(f"You had the role: {' and '.join(r.name for r in roles_to_remove)} and it got removed", delete_after=30)
-                except discord.Forbidden:
-                    await channel.send("Error: Missing permissions or role hierarchy issue.")
-            if payload.emoji.name == "🟩":
-                role = discord.utils.get(user.guild.roles, name="charlie squadmember")
-                await user.add_roles(role)
-            elif payload.emoji.name == "🟦":
-                role = discord.utils.get(user.guild.roles, name="bravo squadmember")
-                await user.add_roles(role)
-            await message.remove_reaction(payload.emoji, user)
-            await channel.send(f"{user.mention} has been assigned to {role}", delete_after=30)
-            db.add_role_cooldown(payload.user_id, 7*24*60*60)
+                    for role_name in role_dictionary_values:
+                        role_to_remove = discord.utils.get(user.guild.roles, name=role_name)
+                        await user.remove_roles(role_to_remove)
+                except:
+                    pass
+                if role_names in role_dictionary_values:
+                    print("Need to remove role(s)")
 
+                await user.add_roles(role_to_assign)
+                await channel.send(f"{user.mention} has been assigned to {role_to_assign}", delete_after=30)
+                db.add_role_cooldown(payload.user_id, 7*25*60*60)
+        # cleanup
+# !CHANGE COOLDOWN !
 client.run(bot_token)
