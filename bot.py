@@ -3,12 +3,9 @@ import os
 import datetime
 import discord
 from discord import (app_commands)
-from pyexpat.errors import messages
-
 from database import ModerationDatabase
 import json
 from dotenv import load_dotenv
-
 
 db = ModerationDatabase()
 
@@ -251,7 +248,6 @@ async def on_ready():
     for reaction in reactions:
         await message.add_reaction(reaction)
 
-
 # The actual role assignment
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
@@ -268,12 +264,11 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         role_name_to_assign = ROLE_DICTIONARY.get(str(payload.emoji))
         user = payload.member
         await message.remove_reaction(payload.emoji, user)
-
         # Check of the user is on cooldown, if yes send msg and stop
         if cooldown:
             await channel.send(f"{user.mention} is on cooldown for {str(datetime.timedelta(seconds=cooldown_time))} seconds",delete_after=30)
-            await message.remove_reaction(payload.emoji, user)
         else:
+            print(str(payload.emoji))
             # Check if the emote that was reacted is one we track
             if str(payload.emoji) not in ROLE_DICTIONARY:
                 return
@@ -282,26 +277,23 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 roles_to_remove = [v for v in ROLE_DICTIONARY.values() if v != "reset"]
                 for role_name in roles_to_remove:
                     role_to_remove = discord.utils.get(user.guild.roles, name=role_name)
-                    await channel.send(f"{user.mention} rest and {role_to_remove} was removed.", delete_after=30)
                     await user.remove_roles(role_to_remove)
+                await channel.send(f"{user.mention} has been reset.", delete_after=30)
             # The value isn't reset so its a role we want to assign
             # We must make sure the user only has 1 of the roles in the list at a time (no charlie and bravo at the same time)
             # If the user has a role that isn't the one they requested and is also in the dictiary, remove it first
             else:
                 role_to_assign = discord.utils.get(user.guild.roles, name=role_name_to_assign)
-                role_names = [role.name for role in user.roles]
                 try:
                     for role_name in role_dictionary_values:
                         role_to_remove = discord.utils.get(user.guild.roles, name=role_name)
                         await user.remove_roles(role_to_remove)
                 except:
                     pass
-                if role_names in role_dictionary_values:
-                    print("Need to remove role(s)")
 
                 await user.add_roles(role_to_assign)
                 await channel.send(f"{user.mention} has been assigned to {role_to_assign}", delete_after=30)
-                db.add_role_cooldown(payload.user_id, 7*25*60*60)
+                db.add_role_cooldown(payload.user_id, 7*24*60*60)
         # cleanup
 # !CHANGE COOLDOWN !
 client.run(bot_token)
