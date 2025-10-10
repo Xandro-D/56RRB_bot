@@ -5,11 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/requirments.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/RRB_Bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/RRB_Bot.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hierarchy.json" beforeDir="false" afterPath="$PROJECT_DIR$/hierarchy.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,8 +39,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/Xandro-Diels/60RRB_bot.git&quot;,
-    &quot;accountId&quot;: &quot;d54da238-f70f-4cbd-8432-659860f2857d&quot;
+    &quot;url&quot;: &quot;https://github.com/Xandro-Diels/60RRB_bot&quot;,
+    &quot;accountId&quot;: &quot;89e91ef0-4033-49b0-b5fb-17bbf4b2ce8e&quot;
   }
 }</component>
   <component name="ProjectColorInfo">{
@@ -114,7 +114,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-b3d66beaba9a-c6efb3732140-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.26199.168" />
+        <option value="bundled-python-sdk-880ecab49056-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.122" />
       </set>
     </attachedChunks>
   </component>

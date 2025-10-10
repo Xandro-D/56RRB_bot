@@ -119,20 +119,22 @@ async def promote(
                 branch = ARMOR_ROLE_HIERARCHY
                 prefix_type = ARMOR_ROLE_PREFIX
                 await promotion(armor_ranks, target, branch, prefix_type, interaction)
-        await interaction.followup.send("I am done :)")
+        await interaction.followup.send("I am done :)", delete_after=30)
 
 
 async def promotion(ranks, target, branch, prefix_type, interaction):
     current_index = branch.index(ranks[0])
     next_index = current_index + 1
-    if next_index < len(branch):
+    if not next_index < len(branch):
+        await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
+    else:
         # Get the name of the current rank and next rank, then search up the corresponding role
         current_rank_name = branch[current_index]
         next_rank_name = branch[next_index]
         current_role = discord.utils.get(target.guild.roles, name=current_rank_name)
         next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
         author = interaction.user
-        # Add the next role (promotion) and remove the cleanup.
+        # Add the next role (promotion) and remove the old role.
         await target.add_roles(next_role)
         await target.remove_roles(current_role)
         # Get the prefix for the current role IE PFC.
@@ -148,8 +150,7 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
             "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
             " to " + str(next_rank_name) + " by " + author.mention
         )
-    else:
-        await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
+
 
 # End of promotion command
 
@@ -252,8 +253,10 @@ async def on_ready():
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     db.remove_expired_role_cooldown()
+    # Check if the reaction is from the bot if it is stop
     if payload.user_id == client.user.id:
         return
+    # If the message someone reacted to is the correct message, continue
     if payload.message_id == discord_msg_id:
         cooldown = db.get_role_cooldown(payload.user_id)
         cooldown_time = db.get_role_cooldown_remaining(payload.user_id)
@@ -268,7 +271,6 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         if cooldown:
             await channel.send(f"{user.mention} is on cooldown for {str(datetime.timedelta(seconds=cooldown_time))} seconds",delete_after=30)
         else:
-            print(str(payload.emoji))
             # Check if the emote that was reacted is one we track
             if str(payload.emoji) not in ROLE_DICTIONARY:
                 return
@@ -290,6 +292,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                         await user.remove_roles(role_to_remove)
                 except:
                     pass
+                # Final give them the role they want and add a cooldown to the db
 
                 await user.add_roles(role_to_assign)
                 await channel.send(f"{user.mention} has been assigned to {role_to_assign}", delete_after=30)
