@@ -230,13 +230,16 @@ async def reset(interaction: discord.Interaction, target: discord.Member):
         db.reset_warnings(target.id)
         await interaction.response.send_message(f"{target.display_name} has been reset.")
 
-
-@client.tree.error
+# error handling
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
-    if isinstance(error, app_commands.CommandInvokeError):
-        await interaction.response.send_message("Something went wrong in the command.", ephemeral=True)
-    else:
-        await interaction.response.send_message(f"Error: {error}", ephemeral=True)
+    try:
+        if not interaction.response.is_done():
+            await interaction.response.send_message("Something went wrong in the command.", ephemeral=True)
+        else:
+            # If already responded to, use followup instead
+            await interaction.followup.send("Something went wrong in the command.", ephemeral=True)
+    except Exception as e:
+        print(f"Error in error handler: {e}")
 
 #         Start of bot reaction role assignment
 # Make the bot react wth all listened to reaction on read
@@ -299,4 +302,53 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                 db.add_role_cooldown(payload.user_id, 7*24*60*60)
         # cleanup
 # !CHANGE COOLDOWN !
+# end of role assignment by reaction
+# Start of whoisin section
+@client.tree.command(name="whoisin", description="Dm's a list of people who are in either of the asked for roles.")
+async def whoisin(
+        interaction: discord.Interaction,
+        role1: discord.Role,
+        role2: discord.Role = None,
+        role3: discord.Role = None,
+):
+    count = 0
+    await interaction.response.defer(ephemeral=True)
+    user = interaction.user
+    roles = [role1, role2, role3]
+    try :
+        for role in roles:
+            if not role:
+                break
+            else:
+                members = role.members
+                for member in members:
+                    count = count + 1
+                    await user.send(f"**{member.display_name}** has role: {role}")
+                await user.send(f"------------ A total of: {count} have the {role} role ------------")
+                count = 0
+        await interaction.followup.send(f"DM sent to {user.name}!", ephemeral=True)
+    except discord.Forbidden:
+        await interaction.followup.send("I couldn't dm you, you might have dms disabled", ephemeral=True)
+
+@client.tree.command(name="whoisinboth", description="Dms a list of people who are in both role1 and role2.")
+async def whoisinboth(
+        interaction: discord.Interaction,
+        role1: discord.Role,
+        role2: discord.Role,
+):
+    await interaction.response.defer(ephemeral=True)
+    count = 0
+    user = interaction.user
+    member_list1 = role1.members
+    member_list2 = role2.members
+    try :
+        for member in member_list1:
+            if member in member_list2:
+                count += 1
+                await user.send(f"**{member.display_name}** has: {role1.name} and {role2.name}")
+        await user.send(f"------------ A total of {count} have both the {role1.name} and {role2.name} role ------------")
+        await interaction.followup.send(f"DM sent to {user.name}!", ephemeral=True)
+    except discord.Forbidden:
+        await interaction.followup.send("I couldn't dm you, you might have dms disabled", ephemeral=True)
+
 client.run(bot_token)
