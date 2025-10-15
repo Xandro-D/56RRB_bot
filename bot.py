@@ -66,7 +66,6 @@ async def admin_check(interaction):
 
 # Silly fact check commands, checks if user has an authorized role and response positively if they do.
 
-
 @client.tree.command(name="factcheck", description="The silly factcheck, totally fair and all knowing.")
 async def factcheck(interaction: discord.Interaction):
     author = interaction.user
@@ -77,7 +76,6 @@ async def factcheck(interaction: discord.Interaction):
         await interaction.response.send_message(random.choice(SILLY_FACT_CHECK_NEGATIVE))
 
 # Start of the promote command
-
 
 @client.tree.command(name="promote", description="Promotes users mentioned in the arguments.")
 async def promote(
@@ -151,12 +149,10 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
             " to " + str(next_rank_name) + " by " + author.mention
         )
 
-
 # End of promotion command
 
 # Start of moderation commands
 # Strike command
-
 
 @client.tree.command(name="strike", description="Strike a person, strikes last 6 months.")
 async def strike(interaction: discord.Interaction, target: discord.Member):
@@ -170,7 +166,6 @@ async def strike(interaction: discord.Interaction, target: discord.Member):
             await interaction.response.send_message(
                 f"{target.display_name} has three or more strikes and should be banned, get em boys."
             )
-
 
 @client.tree.command(name="remove_strike", description="Removes 1 strike from a person")
 async def remove_strike(interaction: discord.Interaction, target: discord.Member):
@@ -187,7 +182,6 @@ async def remove_strike(interaction: discord.Interaction, target: discord.Member
 # End of strike commands
 # Warn commands
 
-
 @client.tree.command(name="warn", description="Gives 1 warning to a person, warnings last until a strike.")
 async def warn(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
@@ -201,7 +195,6 @@ async def warn(interaction: discord.Interaction, target: discord.Member):
                        f"Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns.")
             await interaction.response.send_message(message)
 
-
 @client.tree.command(name="remove_warn", description="Removes 1 warning from a person.")
 async def remove_warn(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
@@ -214,7 +207,6 @@ async def remove_warn(interaction: discord.Interaction, target: discord.Member):
             await interaction.response.send_message(
                 f"{target.display_name} has no warnings to remove."
             )
-
 
 @client.tree.command(name="info", description="displays")
 async def info(interaction: discord.Interaction, target: discord.Member):
@@ -284,9 +276,9 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
                     role_to_remove = discord.utils.get(user.guild.roles, name=role_name)
                     await user.remove_roles(role_to_remove)
                 await channel.send(f"{user.mention} has been reset.", delete_after=30)
-            # The value isn't reset so its a role we want to assign
+            # The value isn't reset so it's a role we want to assign
             # We must make sure the user only has 1 of the roles in the list at a time (no charlie and bravo at the same time)
-            # If the user has a role that isn't the one they requested and is also in the dictiary, remove it first
+            # If the user has a role that isn't the one they requested and is also in the dictionary, remove it first
             else:
                 role_to_assign = discord.utils.get(user.guild.roles, name=role_name_to_assign)
                 try:
@@ -315,20 +307,18 @@ async def whoisin(
     await interaction.response.defer(ephemeral=True)
     user = interaction.user
     roles = [role1, role2, role3]
-    try :
-        for role in roles:
-            if not role:
-                break
-            else:
-                members = role.members
-                for member in members:
-                    count = count + 1
-                    await user.send(f"**{member.display_name}** has role: {role}")
-                await user.send(f"------------ A total of: {count} have the {role} role ------------")
-                count = 0
-        await interaction.followup.send(f"DM sent to {user.name}!", ephemeral=True)
-    except discord.Forbidden:
-        await interaction.followup.send("I couldn't dm you, you might have dms disabled", ephemeral=True)
+    for role in roles:
+        if not role:
+            break
+        else:
+            member_list = [f"The following people are in {role.mention}"]
+            members = role.members
+            for member in members:
+                count = count + 1
+                member_list.append(f"{member.mention}")
+            member_list.append(f"For a total of {count} people.")
+            await interaction.followup.send("\n".join(member_list), ephemeral=True)
+            count = 0
 
 @client.tree.command(name="whoisinboth", description="Dms a list of people who are in both role1 and role2.")
 async def whoisinboth(
@@ -341,14 +331,13 @@ async def whoisinboth(
     user = interaction.user
     member_list1 = role1.members
     member_list2 = role2.members
-    try :
-        for member in member_list1:
-            if member in member_list2:
-                count += 1
-                await user.send(f"**{member.display_name}** has: {role1.name} and {role2.name}")
-        await user.send(f"------------ A total of {count} have both the {role1.name} and {role2.name} role ------------")
-        await interaction.followup.send(f"DM sent to {user.name}!", ephemeral=True)
-    except discord.Forbidden:
-        await interaction.followup.send("I couldn't dm you, you might have dms disabled", ephemeral=True)
+    member_list_final = [f'The following people are in both {role1.mention} and {role2.mention}.']
+    for member in member_list1:
+        if member in member_list2:
+            count += 1
+            member_list_final.append(f"{member.mention}")
+            # await user.send(f"**{member.display_name}** has: {role1.name} and {role2.name}")
+    member_list_final.append(f"For a total of {count} people.")
+    await interaction.followup.send("\n".join(member_list_final), ephemeral=True)
 
 client.run(bot_token)
