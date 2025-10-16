@@ -1,6 +1,8 @@
 import random
 import os
 import datetime
+from itertools import count
+
 import discord
 from discord import (app_commands)
 from database import ModerationDatabase
@@ -61,7 +63,7 @@ async def admin_check(interaction):
     if any(role.name in AUTHORIZED_ROLES for role in author.roles):
         return True
     else:
-        await interaction.response.send_message("You are not authorized to use this command")
+        await interaction.followup.send_message("You are not authorized to use this command")
         return False
 
 # Silly fact check commands, checks if user has an authorized role and response positively if they do.
@@ -117,7 +119,7 @@ async def promote(
                 branch = ARMOR_ROLE_HIERARCHY
                 prefix_type = ARMOR_ROLE_PREFIX
                 await promotion(armor_ranks, target, branch, prefix_type, interaction)
-        await interaction.followup.send("I am done :)", delete_after=30)
+        await interaction.followup.send("I am done :)",)
 
 
 async def promotion(ranks, target, branch, prefix_type, interaction):
@@ -148,7 +150,18 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
             "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
             " to " + str(next_rank_name) + " by " + author.mention
         )
-
+        # Join squads reminders ! its hardcoded sadly ;(
+        target_role_names = {r.name for r in target.roles if r != target.guild.default_role}
+        if not set(target_role_names) & set(ROLE_DICTIONARY.values()):
+            bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
+            bravo_role_count = len(bravo_role.members)
+            charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
+            charlie_role_count = len(charlie_role.members)
+            if bravo_role_count > charlie_role_count:
+                squad_to_join = "Charlie"
+            else:
+                squad_to_join = "Bravo"
+            await target.send(f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
 # End of promotion command
 
 # Start of moderation commands
