@@ -1,8 +1,6 @@
 import random
 import os
 import datetime
-from itertools import count
-
 import discord
 from discord import (app_commands)
 from database import ModerationDatabase
@@ -96,8 +94,16 @@ async def promote(
     await interaction.response.defer()
     targets_unfiltered = [target1, target2, target3, target4, target5, target6, target7, target8, target9, target10]
     targets = [t for t in targets_unfiltered if t is not None]
+    success_count = 0
+    fail_count = 0
     if await admin_check(interaction):
         for target in targets:
+            if db.get_promote_cooldown(target.id):
+                fail_count += 1
+                cooldown_time = db.get_promote_cooldown_remaining(target.id)
+                await interaction.channel.send(f"{target.display_name} is on cooldown for {datetime.timedelta(seconds=cooldown_time)}")
+                continue
+            success_count += 1
             role_names = [role.name for role in target.roles if role.name != "@everyone"]
             user_ranks_ground = [role for role in GROUND_ROLE_HIERARCHY if role in role_names]
             nco_ranks = [role for role in NCO_ROLE_HIERARCHY if role in role_names]
@@ -119,7 +125,8 @@ async def promote(
                 branch = ARMOR_ROLE_HIERARCHY
                 prefix_type = ARMOR_ROLE_PREFIX
                 await promotion(armor_ranks, target, branch, prefix_type, interaction)
-        await interaction.followup.send("I am done :)",)
+        await interaction.followup.send(f"A total of {success_count} people have been promoted\n"
+                                        f" {fail_count} promotions have failed",)
 
 
 async def promotion(ranks, target, branch, prefix_type, interaction):
@@ -128,41 +135,54 @@ async def promotion(ranks, target, branch, prefix_type, interaction):
     if not next_index < len(branch):
         await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
     else:
-        # Get the name of the current rank and next rank, then search up the corresponding role
-        current_rank_name = branch[current_index]
-        next_rank_name = branch[next_index]
-        current_role = discord.utils.get(target.guild.roles, name=current_rank_name)
-        next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
-        author = interaction.user
-        # Add the next role (promotion) and remove the old role.
-        await target.add_roles(next_role)
-        await target.remove_roles(current_role)
-        # Get the prefix for the current role IE PFC.
-        # Split the current username by the Space inbetween the prefix and nickname, thn replace the prefix.
-        new_prefix = prefix_type[next_index]
-        nickname = target.display_name
-        nickname_parts = nickname.split(' ', 1)
-        # nickname_parts [0] PFC
-        # nickname_parts[1] User
-        new_nickname = new_prefix + " " + nickname_parts[1]
-        await target.edit(nick=new_nickname)
-        await interaction.channel.send(
-            "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
-            " to " + str(next_rank_name) + " by " + author.mention
-        )
-        # Join squads reminders ! its hardcoded sadly ;(
+        try:
+            # Get the name of the current rank and next rank, then search up the corresponding role
+            current_rank_name = branch[current_index]
+            next_rank_name = branch[next_index]
+            current_role = discord.utils.get(target.guild.roles, name=current_rank_name)
+            next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
+            author = interaction.user
+            # Add the next role (promotion) and remove the old role.
+            await target.add_roles(next_role)
+            await target.remove_roles(current_role)
+            # Get the prefix for the current role IE PFC.
+            # Split the current username by the Space inbetween the prefix and nickname, thn replace the prefix.
+            new_prefix = prefix_type[next_index]
+            nickname = target.display_name
+            nickname_parts = nickname.split(' ', 1)
+            # nickname_parts [0] PFC
+            # nickname_parts[1] User
+            new_nickname = new_prefix + " " + nickname_parts[1]
+            await target.edit(nick=new_nickname)
+            await interaction.channel.send(
+                "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
+                " to " + str(next_rank_name) + " by " + author.mention
+            )
+            # Send cooldown to database with target ID and time to expire in seconds (1week 60*60*24*7)
+            db.add_promote_cooldown(target.id,60*60*24*7)
+            # Join squads reminders ! its hardcoded sadly ;(
+        except on_app_command_error():
+            await interaction.channel.send(f"Something went worng with {target.display_name} 's promotion.")
         target_role_names = {r.name for r in target.roles if r != target.guild.default_role}
         if not set(target_role_names) & set(ROLE_DICTIONARY.values()):
-            bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
-            bravo_role_count = len(bravo_role.members)
-            charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
-            charlie_role_count = len(charlie_role.members)
-            if bravo_role_count > charlie_role_count:
-                squad_to_join = "Charlie"
-            else:
-                squad_to_join = "Bravo"
-            await target.send(f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
-# End of promotion command
+            try:
+                bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
+                bravo_role_count = len(bravo_role.members)
+                charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
+                charlie_role_count = len(charlie_role.members)
+                if bravo_role_count > charlie_role_count:
+                    squad_to_join = "Charlie"
+                else:
+                    squad_to_join = "Bravo"
+                await target.send(f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
+            except:
+                pass
+
+@client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
+async def reset_promote_cooldown(interaction: discord.Interaction,target: discord.Member,):
+    db.reset_promote_cooldown(target.id)
+    interaction.response(f"The promotion cooldown for {target.display_name} has been reset.")
+# End of promotion commands
 
 # Start of moderation commands
 # Strike command
@@ -239,10 +259,10 @@ async def reset(interaction: discord.Interaction, target: discord.Member):
 async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
     try:
         if not interaction.response.is_done():
-            await interaction.response.send_message("Something went wrong in the command.", ephemeral=True)
+            await interaction.response.send_message(f"Something went wrong in the command.\n ```{error}```", ephemeral=True)
         else:
             # If already responded to, use followup instead
-            await interaction.followup.send("Something went wrong in the command.", ephemeral=True)
+            await interaction.followup.send("Something went wrong in the command.\n ```{error}```" , ephemeral=True)
     except Exception as e:
         print(f"Error in error handler: {e}")
 
@@ -261,7 +281,7 @@ async def on_ready():
 @client.event
 async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
     db.remove_expired_role_cooldown()
-    # Check if the reaction is from the bot if it is stop
+    # Check if the reaction is from the bot if it is, stop
     if payload.user_id == client.user.id:
         return
     # If the message someone reacted to is the correct message, continue
@@ -316,9 +336,8 @@ async def whoisin(
         role2: discord.Role = None,
         role3: discord.Role = None,
 ):
-    count = 0
+    user_count = 0
     await interaction.response.defer(ephemeral=True)
-    user = interaction.user
     roles = [role1, role2, role3]
     for role in roles:
         if not role:
@@ -327,11 +346,11 @@ async def whoisin(
             member_list = [f"The following people are in {role.mention}"]
             members = role.members
             for member in members:
-                count = count + 1
+                user_count = user_count + 1
                 member_list.append(f"{member.mention}")
-            member_list.append(f"For a total of {count} people.")
+            member_list.append(f"For a total of {user_count} people.")
             await interaction.followup.send("\n".join(member_list), ephemeral=True)
-            count = 0
+            user_count = 0
 
 @client.tree.command(name="whoisinboth", description="Dms a list of people who are in both role1 and role2.")
 async def whoisinboth(
@@ -340,17 +359,16 @@ async def whoisinboth(
         role2: discord.Role,
 ):
     await interaction.response.defer(ephemeral=True)
-    count = 0
-    user = interaction.user
+    user_count: int = 0
     member_list1 = role1.members
     member_list2 = role2.members
     member_list_final = [f'The following people are in both {role1.mention} and {role2.mention}.']
     for member in member_list1:
         if member in member_list2:
-            count += 1
+            user_count += 1
             member_list_final.append(f"{member.mention}")
             # await user.send(f"**{member.display_name}** has: {role1.name} and {role2.name}")
-    member_list_final.append(f"For a total of {count} people.")
+    member_list_final.append(f"For a total of {user_count} people.")
     await interaction.followup.send("\n".join(member_list_final), ephemeral=True)
 
 client.run(bot_token)

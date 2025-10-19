@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="">
+    <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="added whois and whoisinboth commands">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,6 +41,9 @@
     &quot;accountId&quot;: &quot;89e91ef0-4033-49b0-b5fb-17bbf4b2ce8e&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 8
 }</component>
@@ -155,7 +159,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760102467485</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="added whois and whoisinboth commands">
+      <option name="closed" value="true" />
+      <created>1760297280317</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1760297280317</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -176,7 +188,8 @@
     <MESSAGE value="updated json file to include list for randomly selected responses from !factcheck" />
     <MESSAGE value="UPDATED DB for cooldown, added react react part for adding roles on a cooldown." />
     <MESSAGE value="added comments to code and small improvments" />
-    <option name="LAST_COMMIT_MESSAGE" value="added comments to code and small improvments" />
+    <MESSAGE value="added whois and whoisinboth commands" />
+    <option name="LAST_COMMIT_MESSAGE" value="added whois and whoisinboth commands" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RRB_Bot$database.coverage" NAME="database Coverage Results" MODIFIED="1755267983816" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
