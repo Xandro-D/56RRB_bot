@@ -1,6 +1,6 @@
 # 56RRB Bot
 
-A comprehensive Discord bot built for the 60th Rifle Regiment Brigade featuring automated moderation, promotion systems, role management, squad assignment capabilities, and Google Sheets integration.
+A comprehensive Discord bot built for the 60th rapid respondse Brigade featuring automated moderation, promotion systems, role management, squad assignment capabilities, and Google Sheets integration.
 
 ## Features
 
@@ -24,7 +24,6 @@ A comprehensive Discord bot built for the 60th Rifle Regiment Brigade featuring 
 
 ### 👥 Role Management
 - **Reaction-Based Assignment**: Users can self-assign roles via message reactions
-- **Squad Auto-Assignment**: Automatically balances squad assignments between Bravo and Charlie
 - **Role Cooldowns**: 7-day cooldown between role changes
 - **Smart Reset**: Remove all tracked roles with a single reaction
 - **Automatic Cleanup**: Expired role cooldowns are automatically removed
@@ -192,11 +191,7 @@ The `/sheet` command exports squad member data to a Google Sheet with the follow
 
 ## Contributing
 
-This is a private repository for the 60th Rifle Regiment Brigade. If you have suggestions or find bugs, please contact the repository owner.
-
-## License
-
-Private - All rights reserved
+This is a private repository for the 56tg rapid response Brigade. If you have suggestions or find bugs, please contact the repository owner.
 
 ## Support
 
@@ -204,4 +199,4 @@ For issues or questions about the bot, please contact the server administrators 
 
 ---
 
-**Last Updated**: January 2025
+**Last Updated**: November 2025
