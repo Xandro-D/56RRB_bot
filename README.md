@@ -87,27 +87,27 @@ The bot uses `hierarchy.json` to define:
 ## Commands
 
 ### Moderation Commands
-| Command | Description | Permission Required |
-|---------|-------------|---------------------|
-| `/strike @user` | Issue a strike (expires in 6 months) | Admin Role |
-| `/remove_strike @user` | Remove one strike from a user | Admin Role |
-| `/warn @user` | Issue a warning (2 warnings = 1 strike) | Admin Role |
-| `/remove_warn @user` | Remove one warning from a user | Admin Role |
-| `/info @user` | Display user's current strikes and warnings | Everyone |
-| `/reset @user` | Reset all strikes and warnings for a user | Admin Role |
+| Command                | Description                                 | Permission Required |
+|------------------------|---------------------------------------------|---------------------|
+| `/strike @user`        | Issue a strike (expires in 6 months)        | Admin Role          |
+| `/remove_strike @user` | Remove one strike from a user               | Admin Role          |
+| `/warn @user`          | Issue a warning (2 warnings = 1 strike)     | Admin Role          |
+| `/remove_warn @user`   | Remove one warning from a user              | Admin Role          |
+| `/info @user`          | Display user's current strikes and warnings | Everyone            |
+| `/reset @user`         | Reset all strikes and warnings for a user   | Admin Role          |
 
 ### Promotion Commands
-| Command | Description | Permission Required |
-|---------|-------------|---------------------|
-| `/promote @user1 [@user2...]` | Promote up to 10 users within their branch | Admin Role |
-| `/reset_promote_cooldown @user` | Reset promotion cooldown for a user | Admin Role |
+| Command                         | Description                                | Permission Required |
+|---------------------------------|--------------------------------------------|---------------------|
+| `/promote @user1 [@user2...]`   | Promote up to 10 users within their branch | Admin Role          |
+| `/reset_promote_cooldown @user` | Reset promotion cooldown for a user        | Admin Role          |
 
 ### Utility Commands
-| Command | Description | Permission Required |
-|---------|-------------|---------------------|
-| `/whoisin @role1 [@role2] [@role3]` | List members in specified role(s) | Everyone |
-| `/whoisinboth @role1 @role2` | List members who have both roles | Everyone |
-| `/factcheck` | Fun fact-checking command | Everyone |
+| Command                             | Description                       | Permission Required |
+|-------------------------------------|-----------------------------------|---------------------|
+| `/whoisin @role1 [@role2] [@role3]` | List members in specified role(s) | Everyone            |
+| `/whoisinboth @role1 @role2`        | List members who have both roles  | Everyone            |
+| `/factcheck`                        | Fun fact-checking command         | Everyone            |
 
 ## Usage
 
