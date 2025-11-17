@@ -7,7 +7,7 @@ from discord.app_commands import AppCommandError
 from database import ModerationDatabase
 import json
 from dotenv import load_dotenv
-import gooleapi as google
+import googleapi as google
 
 db = ModerationDatabase()
 
