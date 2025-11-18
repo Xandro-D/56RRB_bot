@@ -386,15 +386,12 @@ async def sheet(
     await interaction.response.defer(ephemeral=True)
     if await admin_check(interaction):
         author = interaction.user
-        sheet_data = []
         bravo_role = discord.utils.get(author.guild.roles, name="bravo squadmember")
         charlie_role = discord.utils.get(author.guild.roles, name="charlie squadmember")
         bravo_members = bravo_role.members
         charlie_members = charlie_role.members
-        list_to_append = []
-        list_to_append2 = []
-        roles_to_display = ["Combat Life Saver", "Anti Tank", "Combat Engineer"]
-        sheet_data = [["Bravo", "Combat Life Saver", "Anti Tank", "Combat Engineer"]]  # Header row
+        roles_to_display = ["Combat Life Saver", "Anti Tank", "Combat Engineer","International Scientific Group"]
+        sheet_data = [["Bravo", "Combat Life Saver", "Anti Tank", "Combat Engineer","International Scientific Group"]]  # Header row
 
         for member in bravo_members:
             member_row = [member.display_name]
@@ -407,7 +404,7 @@ async def sheet(
                     member_row.append("❌")
 
             sheet_data.append(member_row)
-        sheet_data.append(["Charlie", "Combat Life Saver", "Anti Tank","Combat Engineer"])
+        sheet_data.append(["Charlie", "Combat Life Saver", "Anti Tank","Combat Engineer","International Scientific Group"])
         for member in charlie_members:
             member_row = [member.display_name]
             member_roles_names = [role.name for role in member.roles if role.name != "@everyone"]
