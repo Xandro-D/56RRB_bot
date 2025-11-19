@@ -1,6 +1,6 @@
 # 56RRB Bot
 
-A comprehensive Discord bot built for the 60th rapid respondse Brigade featuring automated moderation, promotion systems, role management, squad assignment capabilities, and Google Sheets integration.
+A comprehensive Discord bot built for the 56th rapid respondse Brigade featuring automated moderation, promotion systems, role management, squad assignment capabilities, and Google Sheets integration.
 
 ## Features
 
@@ -191,7 +191,7 @@ The `/sheet` command exports squad member data to a Google Sheet with the follow
 
 ## Contributing
 
-This is a private repository for the 56tg rapid response Brigade. If you have suggestions or find bugs, please contact the repository owner.
+This is a private repository for the 56th rapid response Brigade. If you have suggestions or find bugs, please contact the repository owner.
 
 ## Support
 
