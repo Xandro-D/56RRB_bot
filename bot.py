@@ -492,7 +492,6 @@ def add_dlc(html_string,dlc_name,dlc_link):
     tree = html.fromstring(html_string)
 
     dlc_table = tree.xpath(f'//div[@class="dlc-list"]//table')[0]
-    print(dlc_table)
 
     new_row = etree.Element("tr")
     new_row.set("data-type","DlcContainer")
@@ -528,7 +527,7 @@ def get_load_order(html_string):
     for mod in mods:
 
         if mod["name"] in CLIENT_SIDE_MOD_LIST:
-            print(mod)
+            continue
         else:
             load_order += f"@{mod["name"]};"
     load_order = re.sub(r'[(),!:.|\\/]', '', load_order).replace("@@", "@")
@@ -595,7 +594,7 @@ async def modpack(
     else:
         if isinstance(html_content, str):
             html_content = html_content.encode('utf-8')
-        file_with_compat = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_without_compat.html")
+        file_with_compat = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_with_compat.html")
 
         load_order = get_load_order(html_content)
 
