@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="Fixed client side modlist">
-      <change beforePath="$PROJECT_DIR$/.idea/RRB_Bot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/RRB_Bot.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="Fixed double qouttes,qoute issue">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -175,7 +174,15 @@
       <option name="project" value="LOCAL" />
       <updated>1767444618346</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Fixed double qouttes,qoute issue">
+      <option name="closed" value="true" />
+      <created>1767445184854</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1767445184854</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -198,7 +205,8 @@
     <MESSAGE value="added comments to code and small improvments" />
     <MESSAGE value="added whois and whoisinboth commands" />
     <MESSAGE value="Fixed client side modlist" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed client side modlist" />
+    <MESSAGE value="Fixed double qouttes,qoute issue" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed double qouttes,qoute issue" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RRB_Bot$database.coverage" NAME="database Coverage Results" MODIFIED="1755267983816" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />

@@ -453,10 +453,10 @@ def add_mod(html_string,modname,modlink):
     mod_table = tree.xpath('//div[@class="mod-list"]//table')[0]
 
     new_row = etree.Element("tr")
-    new_row.set("datatype","ModContainer")
+    new_row.set("datat-ype","ModContainer")
 
     name_cell = etree.SubElement(new_row,"td")
-    name_cell.set("datatype","DisplayName")
+    name_cell.set("data-type","DisplayName")
     name_cell.text = modname
 
     from_cell = etree.SubElement(new_row,"td")
@@ -467,7 +467,7 @@ def add_mod(html_string,modname,modlink):
     link_cell = etree.SubElement(new_row,"td")
     link_a = etree.SubElement(link_cell,"a")
     link_a.set("href",modlink)
-    link_a.set("datatype","Link")
+    link_a.set("data-type","Link")
     link_a.text = modlink
 
     mod_table.append(new_row)
@@ -539,11 +539,9 @@ async def modpack(
         html_file: discord.Attachment,
         op_date:str,
         modpack_name:str=None
-
 ):
     await interaction.response.defer(ephemeral=True)
     await interaction.followup.send(f"reading file... ",ephemeral=True)
-
     author=interaction.user
 
     if not modpack_name:
@@ -565,11 +563,13 @@ async def modpack(
             western_sahara_dlc = True
     await interaction.followup.send(f"DLC: {western_sahara_dlc}  Mod: {western_sahara_mod}",ephemeral=True)
 
-    # If extensive == True we will ask whether to remove certain mods. WIP
 
     if not western_sahara_dlc:
-        new_pack = remove_mod(html_content,"Western Sahara - Creator DLC Compatibility Data for Non-Owners")
-        new_pack = add_dlc(new_pack,"Western Sahara","https://store.steampowered.com/app/1681170")
+        if western_sahara_mod:
+            new_pack = remove_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners")
+            new_pack = add_dlc(new_pack, "Western Sahara", "https://store.steampowered.com/app/1681170")
+        else:
+            new_pack = add_dlc(html_content, "Western Sahara", "https://store.steampowered.com/app/1681170")
 
         if isinstance(new_pack, str):
             new_pack = new_pack.encode('utf-8')
@@ -581,8 +581,14 @@ async def modpack(
         file_with_dlc = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_without_compat.html")
 
     if not western_sahara_mod:
-        new_pack = remove_dlc(html_content,"Western Sahara")
-        new_pack = add_mod(new_pack,"Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+        if western_sahara_dlc:
+            new_pack = remove_dlc(html_content, "Western Sahara")
+            new_pack = add_mod(new_pack, "Western Sahara - Creator DLC Compatibility Data for Non-Owners",
+                               "https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+        else:
+            new_pack = add_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners",
+                               "https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+
 
         if isinstance(new_pack, str):
             new_pack = new_pack.encode('utf-8')
