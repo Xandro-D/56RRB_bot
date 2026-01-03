@@ -529,7 +529,7 @@ def get_load_order(html_string):
         if mod["name"] in CLIENT_SIDE_MOD_LIST:
             continue
         else:
-            load_order += f"@{mod["name"]};"
+            load_order += f'@{mod["name"]};'
     load_order = re.sub(r'[(),!:.|\\/]', '', load_order).replace("@@", "@")
     return load_order
 
