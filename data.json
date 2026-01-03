@@ -94,5 +94,17 @@
     "\uD83D\uDC9A": "charlie squadmember",
     "\uD83D\uDC99": "bravo squadmember",
     "\u2b1c": "reset"
-  }
+  },
+  "CLIENT_SIDE_MOD_LIST": [
+    "Automatic Warning Suppressor",
+    "Cat Ears",
+    "Drone Landing Fix",
+    "JSRS SOUNDMOD 2025 Beta - RC3",
+    "MapTools Remastered",
+    "No More Soul-Less Eyes",
+    "Real Lighting and Weather",
+    "Sensor Target Info",
+    "Simple MapTools",
+    "Better Inventory"
+  ]
 }

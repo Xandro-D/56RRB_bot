@@ -1,6 +1,7 @@
 import random
 import os
 import datetime
+import re
 import discord
 from discord import (app_commands)
 from discord.app_commands import AppCommandError
@@ -8,10 +9,11 @@ from database import ModerationDatabase
 import json
 from dotenv import load_dotenv
 import googleapi as google
-
+from lxml import html,etree
+import io
 db = ModerationDatabase()
 
-with open("hierarchy.json", "r") as f:
+with open("data.json", "r") as f:
     data = json.load(f)
 
 # assign variables from json file
@@ -27,6 +29,7 @@ AUTHORIZED_ROLES = data["AUTHORIZED_ROLES"]
 SILLY_FACT_CHECK_POSITIVE = data["SILLY_FACT_CHECK_POSITIVE"]
 SILLY_FACT_CHECK_NEGATIVE = data["SILLY_FACT_CHECK_NEGATIVE"]
 ROLE_DICTIONARY = data["ROLE_DICTIONARY"]
+CLIENT_SIDE_MOD_LIST = data["CLIENT_SIDE_MOD_LIST"]
 
 # Initializing discord bot
 load_dotenv()
@@ -336,6 +339,7 @@ async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
         # cleanup
 # !CHANGE COOLDOWN !
 # end of role assignment by reaction
+#--------------------------------------------------------------------------------------------------------------------------
 # Start of whoisin section
 @client.tree.command(name="whoisin", description="Dm's a list of people who are in either of the asked for roles.")
 async def whoisin(
@@ -418,6 +422,190 @@ async def sheet(
             sheet_data.append(member_row)
         lines_update = google.sheets(sheet_data)
         await interaction.followup.send(f"{lines_update} lines where updated.", ephemeral=True)
+#         End of who is in section
+# ------------------------------------------------------------------------------------------------
+# Start of modpack checking section.
+def get_mods(content):
+    tree = html.fromstring(content)
+    mods = []
+    for row in tree.xpath('//tr[@data-type="ModContainer"]'):
+        mod = {
+            'name': row.xpath('./td[@data-type="DisplayName"]/text()')[0],
+            'link': row.xpath('.//a[@data-type="Link"]/@href')[0]
+        }
+        mods.append(mod)
+    return mods
+
+def get_dlc(content):
+    tree = html.fromstring(content)
+    dlcs = []
+    for row in tree.xpath('//tr[@data-type="DlcContainer"]'):
+        dlc = {
+            "name": row.xpath('./td[@data-type="DisplayName"]/text()')[0],
+        }
+        dlcs.append(dlc)
+    return dlcs
+
+def add_mod(html_string,modname,modlink):
+
+    tree = html.fromstring(html_string)
+
+    mod_table = tree.xpath('//div[@class="mod-list"]//table')[0]
+
+    new_row = etree.Element("tr")
+    new_row.set("datatype","ModContainer")
+
+    name_cell = etree.SubElement(new_row,"td")
+    name_cell.set("datatype","DisplayName")
+    name_cell.text = modname
+
+    from_cell = etree.SubElement(new_row,"td")
+    from_span = etree.SubElement(from_cell,"span")
+    from_span.set("class","from-steam")
+    from_span.text = "Steam"
+
+    link_cell = etree.SubElement(new_row,"td")
+    link_a = etree.SubElement(link_cell,"a")
+    link_a.set("href",modlink)
+    link_a.set("datatype","Link")
+    link_a.text = modlink
+
+    mod_table.append(new_row)
+
+    html_string = html.tostring(tree,encoding="unicode")
+
+    return html_string
+
+def remove_mod(html_string,modname):
+    tree = html.fromstring(html_string)
+
+    mod_to_remove = tree.xpath(f'//td[text()="{modname}"]')[0]
+
+    row = mod_to_remove.getparent()
+    row.getparent().remove(row)
+
+    html_string = html.tostring(tree,encoding="unicode")
+
+    return html_string
+
+def add_dlc(html_string,dlc_name,dlc_link):
+    tree = html.fromstring(html_string)
+
+    dlc_table = tree.xpath(f'//div[@class="dlc-list"]//table')[0]
+    print(dlc_table)
+
+    new_row = etree.Element("tr")
+    new_row.set("data-type","DlcContainer")
+
+    name_cell = etree.SubElement(new_row,"td")
+    name_cell.set("data-type","DisplayName")
+    name_cell.text = dlc_name
+
+    link_cell = etree.SubElement(new_row,"td")
+    a_link = etree.SubElement(link_cell,"a")
+    a_link.set("href",dlc_link)
+    a_link.set("data-type","link")
+    a_link.text = dlc_link
+
+    dlc_table.append(new_row)
+    html_string = html.tostring(tree,encoding="unicode")
+    return html_string
+
+def remove_dlc(html_string,dlc_name):
+    tree = html.fromstring(html_string)
+
+    dlc_to_remove = tree.xpath(f'//tr[@data-type="DlcContainer"]//td[text()="{dlc_name}"]')[0]
+
+    row = dlc_to_remove.getparent()
+    row.getparent().remove(row)
+
+    html_string = html.tostring(tree,encoding="unicode")
+    return html_string
+
+def get_load_order(html_string):
+    mods = get_mods(html_string)
+    load_order = ""
+    for mod in mods:
+
+        if mod["name"] in CLIENT_SIDE_MOD_LIST:
+            print(mod)
+        else:
+            load_order += f"@{mod["name"]};"
+    load_order = re.sub(r'[(),!:.|\\/]', '', load_order).replace("@@", "@")
+    return load_order
+
+@client.tree.command(name="modpack", description="Description")
+async def modpack(
+        interaction: discord.Interaction,
+        html_file: discord.Attachment,
+        op_date:str,
+        modpack_name:str=None
+
+):
+    await interaction.response.defer(ephemeral=True)
+    await interaction.followup.send(f"reading file... ",ephemeral=True)
+
+    author=interaction.user
+
+    if not modpack_name:
+        modpack_name = html_file.filename.replace(".html","")
+
+    html_content = await html_file.read()
+    mods = get_mods(html_content)
+    dlcs = get_dlc(html_content)
+
+#     Check if western sahara mod is enabled
+    western_sahara_mod = False
+    for mod in mods:
+        if mod["name"] == "Western Sahara - Creator DLC Compatibility Data for Non-Owners":
+            western_sahara_mod = True
+#      Check if mod has western sahara dlc:
+    western_sahara_dlc = False
+    for dlc in dlcs:
+        if dlc["name"] == "Western Sahara":
+            western_sahara_dlc = True
+    await interaction.followup.send(f"DLC: {western_sahara_dlc}  Mod: {western_sahara_mod}",ephemeral=True)
+
+    # If extensive == True we will ask whether to remove certain mods. WIP
+
+    if not western_sahara_dlc:
+        new_pack = remove_mod(html_content,"Western Sahara - Creator DLC Compatibility Data for Non-Owners")
+        new_pack = add_dlc(new_pack,"Western Sahara","https://store.steampowered.com/app/1681170")
+
+        if isinstance(new_pack, str):
+            new_pack = new_pack.encode('utf-8')
+        file_with_dlc = discord.File(fp=io.BytesIO(new_pack), filename=f"{modpack_name}_without_compat.html")
+
+    else:
+        if isinstance(html_content, str):
+            html_content = html_content.encode('utf-8')
+        file_with_dlc = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_without_compat.html")
+
+    if not western_sahara_mod:
+        new_pack = remove_dlc(html_content,"Western Sahara")
+        new_pack = add_mod(new_pack,"Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+
+        if isinstance(new_pack, str):
+            new_pack = new_pack.encode('utf-8')
+        file_with_compat = discord.File(fp=io.BytesIO(new_pack), filename=f"{modpack_name}_with_compat.html")
+
+        #  Load order must include western sahara.
+        load_order = get_load_order(new_pack)
+
+    else:
+        if isinstance(html_content, str):
+            html_content = html_content.encode('utf-8')
+        file_with_compat = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_without_compat.html")
+
+        load_order = get_load_order(html_content)
+
+    if isinstance(load_order,str):
+        load_order = load_order.encode("utf-8")
+    file_with_load_order = discord.File(fp=io.BytesIO(load_order),filename=f"{modpack_name} load order.txt")
+
+    await interaction.followup.send(content=f"Load order:",file=file_with_load_order,ephemeral=True)
+    await interaction.channel.send(content=f"[{op_date}] {modpack_name} **Without the compat**, make sure the western sahara dlc is loaded. Made by {author.mention}", file=file_with_dlc)
+    await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compact**, only loading the modpack is needed. Made by {author.mention}",file=file_with_compat)
 
 
 client.run(bot_token)
