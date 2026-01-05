@@ -222,7 +222,7 @@ async def check_roles(
             if GROUND_ROLE_HIERARCHY.index(user_ranks_ground[0]) >= 2:
                 needed_roles = await check_needed_roles(member)
                 if needed_roles:
-                    await interaction.followup.send(f"{member.mention} still needs {", ".join(needed_roles)}",ephemeral=True)
+                    await interaction.followup.send(f"{member.mention} still needs {', '.join(needed_roles)}'",ephemeral=True)
 
 
 
