@@ -79,8 +79,82 @@ async def factcheck(interaction: discord.Interaction):
         await interaction.response.send_message(random.choice(SILLY_FACT_CHECK_POSITIVE))
     else:
         await interaction.response.send_message(random.choice(SILLY_FACT_CHECK_NEGATIVE))
+        # -----------------------------------------------------------------------------------
+        # Start of the promote command
 
-# Start of the promote command
+
+async def check_needed_roles(target: discord.Member,list_to_check: list = ("Combat Life Saver", "Combat Engineer", "Anti Tank") ):
+    roles_needed_list = []
+    role_names = [role.name for role in target.roles if role.name != "@everyone"]
+    for role in list_to_check:
+        if role in role_names:
+            continue
+        else:
+            roles_needed_list.append(role)
+    return roles_needed_list
+
+
+async def promotion(ranks, target, branch, prefix_type, interaction,target_roles=None):
+    global success_count
+    global fail_count
+    current_index = branch.index(ranks[0])
+    next_index = current_index + 1
+    # Check if target has enough required trainings (only for ground gooners)
+    if branch == GROUND_ROLE_HIERARCHY:
+        if next_index >= 2:
+            needed_roles = await check_needed_roles(target)
+            if len(needed_roles) > 0:
+                await interaction.channel.send(f"{target.mention} needs {', '.join(needed_roles)} to promote")
+                return
+    if not next_index < len(branch):
+        await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
+    else:
+        try:
+            # Get the name of the current rank and next rank, then search up the corresponding role
+            current_rank_name = branch[current_index]
+            next_rank_name = branch[next_index]
+            current_role = discord.utils.get(target.guild.roles, name=current_rank_name)
+            next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
+            author = interaction.user
+            # Add the next role (promotion) and remove the old role.
+            await target.add_roles(next_role)
+            await target.remove_roles(current_role)
+            # Get the prefix for the current role IE PFC.
+            # Split the current username by the Space inbetween the prefix and nickname, thn replace the prefix.
+            new_prefix = prefix_type[next_index]
+            nickname = target.display_name
+            nickname_parts = nickname.split(' ', 1)
+            # nickname_parts [0] PFC
+            # nickname_parts[1] User
+            new_nickname = new_prefix + " " + nickname_parts[1]
+            await target.edit(nick=new_nickname)
+            await interaction.channel.send(
+                "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
+                " to " + str(next_rank_name) + " by " + author.mention
+            )
+            # Send cooldown to database with target ID and time to expire in seconds (1week 60*60*24*7)
+            db.add_promote_cooldown(target.id,60*60*24*7)
+            # Join squads reminders ! its hardcoded sadly ;(
+            success_count += 1
+        except on_app_command_error(interaction,AppCommandError[0]):
+            fail_count +=1
+            await interaction.channel.send(f"Something went wrong with {target.display_name} 's promotion.")
+        target_role_names = {r.name for r in target.roles if r != target.guild.default_role}
+        if not set(target_role_names) & set(ROLE_DICTIONARY.values()):
+            try:
+                bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
+                bravo_role_count = len(bravo_role.members)
+                charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
+                charlie_role_count = len(charlie_role.members)
+                if bravo_role_count > charlie_role_count:
+                    squad_to_join = "Charlie"
+                else:
+                    squad_to_join = "Bravo"
+                await target.send(f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
+            except:
+                pass
+
+
 success_count = 0
 fail_count = 0
 @client.tree.command(name="promote", description="Promotes users mentioned in the arguments.")
@@ -135,64 +209,28 @@ async def promote(
         await interaction.followup.send(f"A total of {success_count} people have been promoted\n"
                                         f" {fail_count} promotions have failed",)
 
+@client.tree.command(name="check_roles",description="A temporary command to check who still needs trainings.")
+async def check_roles(
+        interaction: discord.Interaction,
+        role : discord.Role
+):
+    await interaction.response.defer(ephemeral=True)
+    for member in role.members:
+        role_names = [role.name for role in member.roles if role.name != "@everyone"]
+        user_ranks_ground = [role for role in GROUND_ROLE_HIERARCHY if role in role_names]
+        if user_ranks_ground:
+            if GROUND_ROLE_HIERARCHY.index(user_ranks_ground[0]) >= 2:
+                needed_roles = await check_needed_roles(member)
+                if needed_roles:
+                    await interaction.followup.send(f"{member.mention} still needs {", ".join(needed_roles)}",ephemeral=True)
 
-async def promotion(ranks, target, branch, prefix_type, interaction):
-    global success_count
-    global fail_count
-    current_index = branch.index(ranks[0])
-    next_index = current_index + 1
-    if not next_index < len(branch):
-        await interaction.channel.send(target.display_name + " is already the highest rank in his/her branch")
-    else:
-        try:
-            # Get the name of the current rank and next rank, then search up the corresponding role
-            current_rank_name = branch[current_index]
-            next_rank_name = branch[next_index]
-            current_role = discord.utils.get(target.guild.roles, name=current_rank_name)
-            next_role = discord.utils.get(target.guild.roles, name=next_rank_name)
-            author = interaction.user
-            # Add the next role (promotion) and remove the old role.
-            await target.add_roles(next_role)
-            await target.remove_roles(current_role)
-            # Get the prefix for the current role IE PFC.
-            # Split the current username by the Space inbetween the prefix and nickname, thn replace the prefix.
-            new_prefix = prefix_type[next_index]
-            nickname = target.display_name
-            nickname_parts = nickname.split(' ', 1)
-            # nickname_parts [0] PFC
-            # nickname_parts[1] User
-            new_nickname = new_prefix + " " + nickname_parts[1]
-            await target.edit(nick=new_nickname)
-            await interaction.channel.send(
-                "Congrats " + target.mention + " you got promoted from " + str(current_rank_name) +
-                " to " + str(next_rank_name) + " by " + author.mention
-            )
-            # Send cooldown to database with target ID and time to expire in seconds (1week 60*60*24*7)
-            db.add_promote_cooldown(target.id,60*60*24*7)
-            # Join squads reminders ! its hardcoded sadly ;(
-            success_count += 1
-        except on_app_command_error(interaction,AppCommandError[0]):
-            fail_count +=1
-            await interaction.channel.send(f"Something went wrong with {target.display_name} 's promotion.")
-        target_role_names = {r.name for r in target.roles if r != target.guild.default_role}
-        if not set(target_role_names) & set(ROLE_DICTIONARY.values()):
-            try:
-                bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
-                bravo_role_count = len(bravo_role.members)
-                charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
-                charlie_role_count = len(charlie_role.members)
-                if bravo_role_count > charlie_role_count:
-                    squad_to_join = "Charlie"
-                else:
-                    squad_to_join = "Bravo"
-                await target.send(f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
-            except:
-                pass
+
 
 @client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
-async def reset_promote_cooldown(interaction: discord.Interaction,target: discord.Member,):
+async def reset_promote_cooldown(interaction: discord.Interaction,
+                                 target: discord.Member,):
     db.reset_promote_cooldown(target.id)
-    interaction.response(f"The promotion cooldown for {target.display_name} has been reset.")
+    await interaction.channel.send(f"The promotion cooldown for {target.display_name} has been reset.")
 # End of promotion commands
 
 # Start of moderation commands
@@ -434,6 +472,7 @@ def get_mods(content):
             'link': row.xpath('.//a[@data-type="Link"]/@href')[0]
         }
         mods.append(mod)
+    for mod in mods: print(mod)
     return mods
 
 def get_dlc(content):
@@ -453,7 +492,7 @@ def add_mod(html_string,modname,modlink):
     mod_table = tree.xpath('//div[@class="mod-list"]//table')[0]
 
     new_row = etree.Element("tr")
-    new_row.set("datat-ype","ModContainer")
+    new_row.set("data-type","ModContainer")
 
     name_cell = etree.SubElement(new_row,"td")
     name_cell.set("data-type","DisplayName")
@@ -525,7 +564,6 @@ def get_load_order(html_string):
     mods = get_mods(html_string)
     load_order = ""
     for mod in mods:
-
         if mod["name"] in CLIENT_SIDE_MOD_LIST:
             continue
         else:
@@ -546,11 +584,11 @@ async def modpack(
 
     if not modpack_name:
         modpack_name = html_file.filename.replace(".html","")
-
     html_content = await html_file.read()
     mods = get_mods(html_content)
     dlcs = get_dlc(html_content)
-
+    print(html_content)
+    for mod in mods:print(mod)
 #     Check if western sahara mod is enabled
     western_sahara_mod = False
     for mod in mods:
@@ -565,45 +603,52 @@ async def modpack(
 
 
     if not western_sahara_dlc:
+        # If the pack does not have the dlc, remove the compat if its there and add the dlc.
         if western_sahara_mod:
-            new_pack = remove_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners")
-            new_pack = add_dlc(new_pack, "Western Sahara", "https://store.steampowered.com/app/1681170")
+            new_pack_no_compat = remove_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners")
+            new_pack_dlc_no_compat = add_dlc(new_pack_no_compat, "Western Sahara", "https://store.steampowered.com/app/1681170")
         else:
-            new_pack = add_dlc(html_content, "Western Sahara", "https://store.steampowered.com/app/1681170")
+            new_pack_dlc_no_compat = add_dlc(html_content, "Western Sahara", "https://store.steampowered.com/app/1681170")
 
-        if isinstance(new_pack, str):
-            new_pack = new_pack.encode('utf-8')
-        file_with_dlc = discord.File(fp=io.BytesIO(new_pack), filename=f"{modpack_name}_without_compat.html")
-
+        if isinstance(new_pack_dlc_no_compat, str):
+            new_pack = new_pack_dlc_no_compat.encode('utf-8')
+        file_with_dlc = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat), filename=f"{modpack_name}_without_compat.html")
+    #  If we do have the dlc, remove the compat if there. dont add the dlc. (the input file is corect.)
     else:
+        if western_sahara_mod:
+            new_pack_no_compat = remove_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners")
+            new_pack_dlc_no_compat = add_dlc(new_pack_no_compat, "Western Sahara","https://store.steampowered.com/app/1681170")
+        else:
+            new_pack_dlc_no_compat = html_content
+
         if isinstance(html_content, str):
             html_content = html_content.encode('utf-8')
-        file_with_dlc = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_without_compat.html")
-
+        file_with_dlc = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat), filename=f"{modpack_name}_without_compat.html")
+    # If we don't have the mod, check if we have the dlc and remove it if we do, then add the mod
     if not western_sahara_mod:
         if western_sahara_dlc:
-            new_pack = remove_dlc(html_content, "Western Sahara")
-            new_pack = add_mod(new_pack, "Western Sahara - Creator DLC Compatibility Data for Non-Owners",
-                               "https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+            new_pack_no_dlc = remove_dlc(html_content, "Western Sahara")
+            new_pack_no_dlc_compat = add_mod(new_pack_no_dlc, "Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
         else:
-            new_pack = add_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners",
-                               "https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+            new_pack_no_dlc_compat = add_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
 
 
-        if isinstance(new_pack, str):
-            new_pack = new_pack.encode('utf-8')
-        file_with_compat = discord.File(fp=io.BytesIO(new_pack), filename=f"{modpack_name}_with_compat.html")
+        if isinstance(new_pack_no_dlc_compat, str):
+            new_pack_no_dlc_compat = new_pack_no_dlc_compat.encode('utf-8')
+        file_with_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat), filename=f"{modpack_name}_with_compat.html")
 
-        #  Load order must include western sahara.
-        load_order = get_load_order(new_pack)
-
+    # If we do have the mod, just remove the dlc if its there else the input pack is corect.
     else:
-        if isinstance(html_content, str):
-            html_content = html_content.encode('utf-8')
-        file_with_compat = discord.File(fp=io.BytesIO(html_content), filename=f"{modpack_name}_with_compat.html")
+        if western_sahara_dlc:
+            new_pack_no_dlc_compat = remove_dlc(html_content, "Western Sahara")
+        else:
+            new_pack_no_dlc_compat = html_content
+        if isinstance(new_pack_no_dlc_compat, str):
+            new_pack_no_dlc_compat_str = new_pack_no_dlc_compat.encode('utf-8')
+        file_with_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat_str), filename=f"{modpack_name}_with_compat.html")
 
-        load_order = get_load_order(html_content)
-
+    print(new_pack_no_dlc_compat)
+    load_order = get_load_order(new_pack_no_dlc_compat)
     if isinstance(load_order,str):
         load_order = load_order.encode("utf-8")
     file_with_load_order = discord.File(fp=io.BytesIO(load_order),filename=f"{modpack_name} load order.txt")
