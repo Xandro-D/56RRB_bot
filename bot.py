@@ -219,7 +219,7 @@ async def check_roles(
         role_names = [role.name for role in member.roles if role.name != "@everyone"]
         user_ranks_ground = [role for role in GROUND_ROLE_HIERARCHY if role in role_names]
         if user_ranks_ground:
-            if GROUND_ROLE_HIERARCHY.index(user_ranks_ground[0]) >= 2:
+            if GROUND_ROLE_HIERARCHY.index(user_ranks_ground[0]) >= 3:
                 needed_roles = await check_needed_roles(member)
                 if needed_roles:
                     await interaction.followup.send(f"{member.mention} still needs {', '.join(needed_roles)}'",ephemeral=True)
@@ -472,7 +472,6 @@ def get_mods(content):
             'link': row.xpath('.//a[@data-type="Link"]/@href')[0]
         }
         mods.append(mod)
-    for mod in mods: print(mod)
     return mods
 
 def get_dlc(content):
@@ -486,6 +485,7 @@ def get_dlc(content):
     return dlcs
 
 def add_mod(html_string,modname,modlink):
+    html_string = html_string.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
 
     tree = html.fromstring(html_string)
 
@@ -511,11 +511,13 @@ def add_mod(html_string,modname,modlink):
 
     mod_table.append(new_row)
 
-    html_string = html.tostring(tree,encoding="unicode")
+    html_string = html.tostring(tree,encoding="utf-8",pretty_print=False,method="xml")
 
     return html_string
 
 def remove_mod(html_string,modname):
+    html_string = html_string.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+
     tree = html.fromstring(html_string)
 
     mod_to_remove = tree.xpath(f'//td[text()="{modname}"]')[0]
@@ -523,11 +525,13 @@ def remove_mod(html_string,modname):
     row = mod_to_remove.getparent()
     row.getparent().remove(row)
 
-    html_string = html.tostring(tree,encoding="unicode")
+    html_string = html.tostring(tree,encoding="utf-8",pretty_print=False,method="xml")
 
     return html_string
 
 def add_dlc(html_string,dlc_name,dlc_link):
+    html_string = html_string.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+
     tree = html.fromstring(html_string)
 
     dlc_table = tree.xpath(f'//div[@class="dlc-list"]//table')[0]
@@ -546,10 +550,12 @@ def add_dlc(html_string,dlc_name,dlc_link):
     a_link.text = dlc_link
 
     dlc_table.append(new_row)
-    html_string = html.tostring(tree,encoding="unicode")
+    html_string = html.tostring(tree,encoding="utf-8",pretty_print=False,method="xml")
     return html_string
 
 def remove_dlc(html_string,dlc_name):
+    html_string = html_string.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
+
     tree = html.fromstring(html_string)
 
     dlc_to_remove = tree.xpath(f'//tr[@data-type="DlcContainer"]//td[text()="{dlc_name}"]')[0]
@@ -557,7 +563,7 @@ def remove_dlc(html_string,dlc_name):
     row = dlc_to_remove.getparent()
     row.getparent().remove(row)
 
-    html_string = html.tostring(tree,encoding="unicode")
+    html_string = html.tostring(tree,encoding="utf-8",pretty_print=False,method="xml")
     return html_string
 
 def get_load_order(html_string):
@@ -587,8 +593,6 @@ async def modpack(
     html_content = await html_file.read()
     mods = get_mods(html_content)
     dlcs = get_dlc(html_content)
-    print(html_content)
-    for mod in mods:print(mod)
 #     Check if western sahara mod is enabled
     western_sahara_mod = False
     for mod in mods:
@@ -617,45 +621,48 @@ async def modpack(
     else:
         if western_sahara_mod:
             new_pack_no_compat = remove_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners")
-            new_pack_dlc_no_compat = add_dlc(new_pack_no_compat, "Western Sahara","https://store.steampowered.com/app/1681170")
+            new_pack_dlc_no_compat_str = add_dlc(new_pack_no_compat, "Western Sahara","https://store.steampowered.com/app/1681170")
         else:
-            new_pack_dlc_no_compat = html_content
+            new_pack_dlc_no_compat_str = html_content
 
         if isinstance(html_content, str):
             html_content = html_content.encode('utf-8')
-        file_with_dlc = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat), filename=f"{modpack_name}_without_compat.html")
+        file_with_dlc = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat_str), filename=f"{modpack_name}_without_compat.html")
     # If we don't have the mod, check if we have the dlc and remove it if we do, then add the mod
     if not western_sahara_mod:
         if western_sahara_dlc:
             new_pack_no_dlc = remove_dlc(html_content, "Western Sahara")
-            new_pack_no_dlc_compat = add_mod(new_pack_no_dlc, "Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+            new_pack_no_dlc_compat_str = add_mod(new_pack_no_dlc, "Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
         else:
-            new_pack_no_dlc_compat = add_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
+            new_pack_no_dlc_compat_str = add_mod(html_content, "Western Sahara - Creator DLC Compatibility Data for Non-Owners","https://steamcommunity.com/sharedfiles/filedetails/?id=2636962953")
 
 
-        if isinstance(new_pack_no_dlc_compat, str):
-            new_pack_no_dlc_compat = new_pack_no_dlc_compat.encode('utf-8')
-        file_with_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat), filename=f"{modpack_name}_with_compat.html")
+        if isinstance(new_pack_no_dlc_compat_str, str):
+            new_pack_no_dlc_compat_str = new_pack_no_dlc_compat_str.encode('utf-8')
+        new_pack_no_dlc_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat_str), filename=f"{modpack_name}_with_compat.html")
 
-    # If we do have the mod, just remove the dlc if its there else the input pack is corect.
+    # If we do have the mod, just remove the dlc if its there else the input pack is correct.
     else:
         if western_sahara_dlc:
             new_pack_no_dlc_compat = remove_dlc(html_content, "Western Sahara")
         else:
             new_pack_no_dlc_compat = html_content
-        if isinstance(new_pack_no_dlc_compat, str):
-            new_pack_no_dlc_compat_str = new_pack_no_dlc_compat.encode('utf-8')
-        file_with_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat_str), filename=f"{modpack_name}_with_compat.html")
+        new_pack_no_dlc_compat_str = (
+            new_pack_no_dlc_compat.encode("utf-8")
+            if isinstance(new_pack_no_dlc_compat, str)
+            else new_pack_no_dlc_compat
+        )
 
-    print(new_pack_no_dlc_compat)
-    load_order = get_load_order(new_pack_no_dlc_compat)
+        new_pack_no_dlc_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat_str), filename=f"{modpack_name}_with_compat.html")
+
+    load_order = get_load_order(new_pack_no_dlc_compat_str)
     if isinstance(load_order,str):
         load_order = load_order.encode("utf-8")
     file_with_load_order = discord.File(fp=io.BytesIO(load_order),filename=f"{modpack_name} load order.txt")
 
     await interaction.followup.send(content=f"Load order:",file=file_with_load_order,ephemeral=True)
     await interaction.channel.send(content=f"[{op_date}] {modpack_name} **Without the compat**, make sure the western sahara dlc is loaded. Made by {author.mention}", file=file_with_dlc)
-    await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compact**, only loading the modpack is needed. Made by {author.mention}",file=file_with_compat)
+    await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compact**, only loading the modpack is needed. Made by {author.mention}",file=new_pack_no_dlc_compat)
 
 
 client.run(bot_token)
