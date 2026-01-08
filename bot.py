@@ -267,13 +267,13 @@ async def remove_strike(interaction: discord.Interaction, target: discord.Member
 @client.tree.command(name="warn", description="Gives 1 warning to a person, warnings last until a strike.")
 async def warn(interaction: discord.Interaction, target: discord.Member):
     if await admin_check(interaction):
-        if db.get_warnings(target.id) < 2:
+        if db.get_warnings(target.id) <= 4:
             db.add_warning(target.id)
             await interaction.response.send_message(f"{target.display_name} has been warned.")
         else:
             db.reset_warnings(target.id)
             db.add_strike(target.id, 15778463)
-            message = (f"{target.display_name} has 2 or more warnings and has been struck. "
+            message = (f"{target.display_name} has 4 or more warnings and has been struck. "
                        f"Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns.")
             await interaction.response.send_message(message)
 
