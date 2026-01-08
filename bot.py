@@ -214,6 +214,7 @@ async def check_roles(
         interaction: discord.Interaction,
         role : discord.Role
 ):
+    message = f""
     await interaction.response.defer(ephemeral=True)
     for member in role.members:
         role_names = [role.name for role in member.roles if role.name != "@everyone"]
@@ -222,8 +223,10 @@ async def check_roles(
             if GROUND_ROLE_HIERARCHY.index(user_ranks_ground[0]) >= 3:
                 needed_roles = await check_needed_roles(member)
                 if needed_roles:
+                    text = f"{member.display_name} still needs {', '.join(needed_roles)}\n"
+                    message += text
                     await interaction.followup.send(f"{member.mention} still needs {', '.join(needed_roles)}'",ephemeral=True)
-
+    await interaction.followup.send(f"```{message}```", ephemeral=True)
 
 
 @client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
