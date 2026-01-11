@@ -60,7 +60,15 @@ class MyClient(discord.Client):
 client = MyClient()
 
 # Admin check, check if user has any roles in the authorized roles list
-async def admin_check(interaction):
+async def admin_check(
+        interaction
+):
+    '''
+    Return True if author of the command has a role from [authorized roles]
+    Returns false if author does not.
+    :param interaction:
+    :return:
+    '''
     author = interaction.user
     # Check if they have a role named "Admin"
     if any(role.name in AUTHORIZED_ROLES for role in author.roles):
@@ -84,6 +92,14 @@ async def factcheck(interaction: discord.Interaction):
 
 
 async def check_needed_roles(target: discord.Member,list_to_check: list = ("Combat Life Saver", "Combat Engineer", "Anti Tank") ):
+    '''
+    Give discord member and list, will return a list of roles that are in the list to check but the member doesn't have
+    ex. If member has the admin role and you check for admin it will return an empty list.
+    If that member doesn't have admin it will return admin in the list.
+    :param target: Discord.member object who's roles we need to check
+    :param list_to_check: the list of role names to check
+    :return: list of roles the user doesn't have but are in list to check
+    '''
     roles_needed_list = []
     role_names = [role.name for role in target.roles if role.name != "@everyone"]
     for role in list_to_check:
@@ -101,7 +117,7 @@ async def promotion(ranks, target, branch, prefix_type, interaction,target_roles
     next_index = current_index + 1
     # Check if target has enough required trainings (only for ground gooners)
     if branch == GROUND_ROLE_HIERARCHY:
-        if next_index >= 2:
+        if next_index >= 3:
             needed_roles = await check_needed_roles(target)
             if len(needed_roles) > 0:
                 await interaction.channel.send(f"{target.mention} needs {', '.join(needed_roles)} to promote")
@@ -227,6 +243,80 @@ async def check_roles(
                     message += text
                     await interaction.followup.send(f"{member.mention} still needs {', '.join(needed_roles)}'",ephemeral=True)
     await interaction.followup.send(f"```{message}```", ephemeral=True)
+
+# Make buttons
+class KickConfirmView(discord.ui.View):
+    def __init__(self, member: discord.Member):
+        super().__init__(timeout=60)
+        self.member = member
+        self.value = None  # True = kick, False = skip
+
+    @discord.ui.button(label="Kick", style=discord.ButtonStyle.danger)
+    async def kick(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button
+    ):
+        self.value = True
+        self.stop()
+        await interaction.response.defer()
+
+    @discord.ui.button(label="Skip", style=discord.ButtonStyle.secondary)
+    async def skip(
+        self,
+        interaction: discord.Interaction,
+        button: discord.ui.Button
+    ):
+        self.value = False
+        self.stop()
+        await interaction.response.defer()
+
+
+
+@client.tree.command(name="bct_check",description="Checks if people need to be kicked cause they haven't signed up.")
+async def bct_check(
+    interaction = discord.Interaction
+):
+    if not await admin_check(interaction):
+        return
+    await interaction.response.defer(ephemeral=True)
+    await interaction.followup.send("Checking users...",ephemeral=True)
+    list_of_members_to_kick = []
+    guild = interaction.guild
+    guild_members = guild.members
+    for member in guild_members:
+        if await check_needed_roles(member,["Member"]):
+            join_date = member.joined_at
+            now = datetime.datetime.now(datetime.timezone.utc)
+            two_months_ago = now - datetime.timedelta(days=60)
+            if join_date < two_months_ago:
+                list_of_members_to_kick.append(member)
+    if not list_of_members_to_kick:
+        await interaction.followup.send(f"No people to review",ephemeral=True)
+        return
+    for member_to_kick in list_of_members_to_kick:
+        timestamp = int(member_to_kick.joined_at.timestamp())
+
+        view = KickConfirmView(member_to_kick)
+        await interaction.followup.send(
+            content=(
+                f"**Review member**\n"
+                f"{member_to_kick.mention}\n"
+                f"Joined <t:{timestamp}:R> \n\n"
+                f"Kick this member?"
+            ),
+            view=view,
+            ephemeral=True
+        )
+
+        await view.wait()
+
+        if view.value is True:
+
+            await member_to_kick.kick(reason="You did not do your bct within two months")
+            await interaction.followup.send(f'{member_to_kick.mention} has been kicked',ephemeral=True)
+        if view.value is False:
+            await interaction.followup.send(f"Not kicking {member_to_kick.mention}",ephemeral=True)
 
 
 @client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
