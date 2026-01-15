@@ -312,8 +312,7 @@ async def bct_check(
         await view.wait()
 
         if view.value is True:
-
-            await member_to_kick.kick(reason="You did not do your bct within two months")
+            await member_to_kick.kick(reason="You have been on the 56ths Discord for longer than a month without getting started, rejoin if you are still interested.")
             await interaction.followup.send(f'{member_to_kick.mention} has been kicked',ephemeral=True)
         if view.value is False:
             await interaction.followup.send(f"Not kicking {member_to_kick.mention}",ephemeral=True)
