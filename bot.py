@@ -245,11 +245,13 @@ async def check_roles(
     await interaction.followup.send(f"```{message}```", ephemeral=True)
 
 # Make buttons
-class KickConfirmView(discord.ui.View):
-    def __init__(self, member: discord.Member):
-        super().__init__(timeout=60)
+class ConfirmView(discord.ui.View):
+    def __init__(self, member: discord.Member,true_lable:str, false_lable:str):
+        super().__init__(timeout=60*4)
         self.member = member
         self.value = None  # True = kick, False = skip
+        self.kick.label = true_lable
+        self.skip.label = false_lable
 
     @discord.ui.button(label="Kick", style=discord.ButtonStyle.danger)
     async def kick(
@@ -297,7 +299,11 @@ async def bct_check(
     for member_to_kick in list_of_members_to_kick:
         timestamp = int(member_to_kick.joined_at.timestamp())
 
-        view = KickConfirmView(member_to_kick)
+        view = ConfirmView(
+            member_to_kick,
+            "Kick",
+            "Skip"
+        )
         await interaction.followup.send(
             content=(
                 f"**Review member**\n"
@@ -316,7 +322,32 @@ async def bct_check(
             await interaction.followup.send(f'{member_to_kick.mention} has been kicked',ephemeral=True)
         if view.value is False:
             await interaction.followup.send(f"Not kicking {member_to_kick.mention}",ephemeral=True)
+        await interaction.followup.send(f"Done checking !", ephemeral=True)
 
+@client.tree.command(name="bct_training",description="Send a private message to everyone who still needs a bct.")
+async def bct_training(
+        interaction: discord.Interaction,
+):
+    await interaction.response.defer()
+    if not await admin_check(interaction):
+        return
+    guild = interaction.guild
+    members = guild.members
+    success_list =[]
+    fail_list = []
+    for member in members:
+        if not await check_needed_roles(member,["Waiting for BCT"]):
+            try:
+                await member.send(f'Hello, you have joined the 56th RRB. To be able to join OPs follow the installation guide and request a BCT https://discord.com/channels/1090564451201196122/1346494156410716281.')
+                success_list.append(member.display_name)
+            except:
+                fail_list.append(member.display_name)
+    if success_list:
+        await interaction.followup.send(f"These users have been send a dm:"
+                                        f"```{'\n'.join(success_list)}```")
+    if fail_list:
+        await interaction.followup.send(f"These users have **not** been send a dm:"
+                                        f"```{'\n'.join(fail_list)}```")
 
 @client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
 async def reset_promote_cooldown(interaction: discord.Interaction,
