@@ -343,11 +343,16 @@ async def bct_training(
             except:
                 fail_list.append(member.display_name)
     if success_list:
-        await interaction.followup.send(f"These users have been send a dm:"
-                                        f"```{'\n'.join(success_list)}```")
+        success_msg = "\n".join(success_list)
+        await interaction.followup.send(
+            f"These users have been sent a DM:\n```{success_msg}```"
+        )
+
     if fail_list:
-        await interaction.followup.send(f"These users have **not** been send a dm:"
-                                        f"```{'\n'.join(fail_list)}```")
+        fail_msg = "\n".join(fail_list)
+        await interaction.followup.send(
+            f"These users have **not** been sent a DM:\n```{fail_msg}```"
+        )
 
 @client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
 async def reset_promote_cooldown(interaction: discord.Interaction,
