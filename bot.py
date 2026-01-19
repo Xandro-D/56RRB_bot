@@ -368,16 +368,18 @@ async def reset_promote_cooldown(interaction: discord.Interaction,
 # Strike command
 
 @client.tree.command(name="strike", description="Strike a person, strikes last 6 months.")
-async def strike(interaction: discord.Interaction, target: discord.Member):
+async def strike(interaction: discord.Interaction, target: discord.Member,reason:str):
     if await admin_check(interaction):
         db.add_strike(target.id, 15778463)
         if db.get_strikes(target.id) < 3:
             await interaction.response.send_message(
                 f"{target.display_name} has been struck and now has {db.get_strikes(target.id)} strikes."
+                f"\nreason:```{reason}```"
             )
         else:
             await interaction.response.send_message(
                 f"{target.display_name} has three or more strikes and should be banned, get em boys."
+                f"\nreason:```{reason}```"
             )
 
 @client.tree.command(name="remove_strike", description="Removes 1 strike from a person")
@@ -396,16 +398,18 @@ async def remove_strike(interaction: discord.Interaction, target: discord.Member
 # Warn commands
 
 @client.tree.command(name="warn", description="Gives 1 warning to a person, warnings last until a strike.")
-async def warn(interaction: discord.Interaction, target: discord.Member):
+async def warn(interaction: discord.Interaction, target: discord.Member,reason:str):
     if await admin_check(interaction):
         if db.get_warnings(target.id) <= 4:
             db.add_warning(target.id)
-            await interaction.response.send_message(f"{target.display_name} has been warned.")
+            await interaction.response.send_message(f"{target.display_name} has been warned."
+                                                    f"\nreason:```{reason}```")
         else:
             db.reset_warnings(target.id)
             db.add_strike(target.id, 15778463)
             message = (f"{target.display_name} has 4 or more warnings and has been struck. "
-                       f"Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns.")
+                       f"Now he has {db.get_strikes(target.id)} strikes and {db.get_warnings(target.id)} warns."
+                       f"\nreason:```{reason}```")
             await interaction.response.send_message(message)
 
 @client.tree.command(name="remove_warn", description="Removes 1 warning from a person.")
