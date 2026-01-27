@@ -709,7 +709,7 @@ def get_load_order(html_string):
             continue
         else:
             load_order += f'@{mod["name"]};'
-    load_order = re.sub(r'[(),!:.|\\/]&', '', load_order).replace("@@", "@")
+    load_order = re.sub(r'[&(),!:.|\\/]', '', load_order).replace("@@", "@")
     return load_order
 
 @client.tree.command(name="modpack", description="Description")
