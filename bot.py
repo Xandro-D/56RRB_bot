@@ -5,12 +5,14 @@ import re
 import discord
 from discord import (app_commands)
 from discord.app_commands import AppCommandError
+from discord.ext import tasks
 from database import ModerationDatabase
 import json
 from dotenv import load_dotenv
 import googleapi as google
 from lxml import html,etree
 import io
+import a2s
 db = ModerationDatabase()
 
 with open("data.json", "r") as f:
@@ -246,9 +248,8 @@ async def check_roles(
 
 # Make buttons
 class ConfirmView(discord.ui.View):
-    def __init__(self, member: discord.Member,true_lable:str, false_lable:str):
+    def __init__(self,true_lable:str, false_lable:str):
         super().__init__(timeout=60*4)
-        self.member = member
         self.value = None  # True = kick, False = skip
         self.kick.label = true_lable
         self.skip.label = false_lable
@@ -300,7 +301,6 @@ async def bct_check(
         timestamp = int(member_to_kick.joined_at.timestamp())
 
         view = ConfirmView(
-            member_to_kick,
             "Kick",
             "Skip"
         )
@@ -357,7 +357,6 @@ async def bct_training(
         )
 
 
-@client.tree.command(name='reset_promote_cooldown',description="Sets the promotion cooldown of the target to 0")
 async def reset_promote_cooldown(interaction: discord.Interaction,
                                  target: discord.Member,):
     db.reset_promote_cooldown(target.id)
@@ -460,6 +459,7 @@ async def on_ready():
     reactions = ROLE_DICTIONARY.keys()
     for reaction in reactions:
         await message.add_reaction(reaction)
+    server_status_loop.start()
 
 # The actual role assignment
 @client.event
@@ -798,6 +798,64 @@ async def modpack(
     await interaction.followup.send(content=f"Load order:",file=file_with_load_order,ephemeral=True)
     await interaction.channel.send(content=f"[{op_date}] {modpack_name} **Without the compat**, make sure the western sahara dlc is loaded. Made by {author.mention}", file=file_with_dlc)
     await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compact**, only loading the modpack is needed. Made by {author.mention}",file=new_pack_no_dlc_compat)
+
+#     Server tracking stuff
+
+# Live player vieuw
+server_status = None
+server_ip = str(os.getenv("SERVER_IP"))
+server_port = int(os.getenv("SERVER_PORT"))
+def get_data(server_ip,server_port):
+    server_address = (server_ip, server_port)
+    info = a2s.info(server_address)
+    players = a2s.players(server_address)
+    return info, players
+
+
+
+@tasks.loop(seconds=60)
+async def server_status_loop():
+    global server_status
+    if server_status is None:
+        channel = discord.utils.get(client.get_all_channels(), name="server-status")
+        if channel is None:
+            print("Error: 'server-status' channel not found!")
+            return
+        server_status = await channel.send("Getting server status...")
+
+    try:
+        server_data = get_data(server_ip,server_port)
+        info = server_data[0]
+        players = server_data[1]
+
+        embed = discord.Embed(
+            title="Server Status",
+            description=f"Online !",
+            color=discord.Color.green(),
+            timestamp=discord.utils.utcnow()
+        )
+
+        # Add players list
+        if players:
+            player_list = "\n".join([f"• {player}" for player in players])
+            embed.add_field(name=f"Players Online ({len(players)})", value=player_list, inline=False)
+        else:
+            embed.add_field(name="Players Online", value="*No players online*", inline=False)
+        embed.add_field(name="Mission:", value=info.game)
+        embed.set_footer(text="Last updated")
+
+        await server_status.edit(content=None, embed=embed)
+
+    except Exception as e:
+        # Handle errors
+        error_embed = discord.Embed(
+            title="Server Status",
+            description="Could not connect to server",
+            color=discord.Color.red(),
+            timestamp=discord.utils.utcnow()
+        )
+        error_embed.set_footer(text=f"Error: {str(e)}")
+        await server_status.edit(content=None, embed=error_embed)
 
 
 client.run(bot_token)
