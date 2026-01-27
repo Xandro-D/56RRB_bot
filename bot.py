@@ -813,7 +813,7 @@ def get_data(server_ip,server_port):
 
 
 
-@tasks.loop(minutes=0.2)
+@tasks.loop(minutes=5)
 async def server_status_loop():
     global server_status
     if server_status is None:
