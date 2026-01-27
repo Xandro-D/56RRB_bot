@@ -813,7 +813,7 @@ def get_data(server_ip,server_port):
 
 
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=0.2)
 async def server_status_loop():
     global server_status
     if server_status is None:
@@ -837,7 +837,7 @@ async def server_status_loop():
 
         # Add players list
         if players:
-            player_list = "\n".join([f"• {player}" for player in players])
+            player_list = "\n".join([f"• {player.name}" for player in players])
             embed.add_field(name=f"Players Online ({len(players)})", value=player_list, inline=False)
         else:
             embed.add_field(name="Players Online", value="*No players online*", inline=False)
