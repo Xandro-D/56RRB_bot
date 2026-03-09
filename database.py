@@ -36,6 +36,12 @@ class ModerationDatabase:
             expires_at INTEGER
         )
         """)
+        self.cursor.execute("""
+        CREATE TABLE IF NOT EXISTS opt_out (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER
+        )
+        """)
         self.conn.commit()
 
     # ---------- Warnings ----------
@@ -185,6 +191,27 @@ class ModerationDatabase:
         self.conn.commit()
 
 
+    # Opt-out
+    def add_opt_out(self,user_id:int):
+        self.cursor.execute("INSERT INTO opt_out (user_id) VALUES (?)",(user_id,))
+        self.conn.commit()
+
+    def remove_opt_out(self,user_id:int):
+        self.cursor.execute("DELETE FROM opt_out WHERE user_id = ?",(user_id,))
+        self.conn.commit()
+
+    def get_opt_out(self,user_id:int):
+        '''
+        Returns True if user is in the opt-out db.
+        :param user_id:
+        :return:
+        '''
+        self.cursor.execute("SELECT COUNT(*) FROM opt_out WHERE user_id = ?",(user_id,))
+        result = self.cursor.fetchone()[0]
+        if result == 0:
+            return False
+        else:
+            return True
     # ---------- General ----------
     def close(self):
         self.conn.close()

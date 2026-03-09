@@ -797,7 +797,7 @@ async def modpack(
 
     await interaction.followup.send(content=f"Load order:",file=file_with_load_order,ephemeral=True)
     await interaction.channel.send(content=f"[{op_date}] {modpack_name} **Without the compat**, make sure the western sahara dlc is loaded. Made by {author.mention}", file=file_with_dlc)
-    await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compact**, only loading the modpack is needed. Made by {author.mention}",file=new_pack_no_dlc_compat)
+    await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compat**, only loading the modpack is needed. Made by {author.mention}",file=new_pack_no_dlc_compat)
 
 #     Server tracking stuff
 
@@ -813,7 +813,7 @@ def get_data(server_ip,server_port):
 
 
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=10)
 async def server_status_loop():
     global server_status
     if server_status is None:
