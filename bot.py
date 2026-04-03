@@ -752,6 +752,7 @@ async def modpack(
         if isinstance(new_pack_dlc_no_compat, str):
             new_pack = new_pack_dlc_no_compat.encode('utf-8')
         file_with_dlc = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat), filename=f"{modpack_name}_without_compat.html")
+        modlist_file = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat), filename=f"modlist.html")
     #  If we do have the dlc, remove the compat if there. dont add the dlc. (the input file is corect.)
     else:
         if western_sahara_mod:
@@ -763,6 +764,7 @@ async def modpack(
         if isinstance(html_content, str):
             html_content = html_content.encode('utf-8')
         file_with_dlc = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat_str), filename=f"{modpack_name}_without_compat.html")
+        modlist_file = discord.File(fp=io.BytesIO(new_pack_dlc_no_compat_str), filename=f"modlist.html")
     # If we don't have the mod, check if we have the dlc and remove it if we do, then add the mod
     if not western_sahara_mod:
         if western_sahara_dlc:
@@ -790,12 +792,18 @@ async def modpack(
 
         new_pack_no_dlc_compat = discord.File(fp=io.BytesIO(new_pack_no_dlc_compat_str), filename=f"{modpack_name}_with_compat.html")
 
-    load_order = get_load_order(new_pack_no_dlc_compat_str)
-    if isinstance(load_order,str):
-        load_order = load_order.encode("utf-8")
-    file_with_load_order = discord.File(fp=io.BytesIO(load_order),filename=f"{modpack_name} load order.txt")
 
-    await interaction.followup.send(content=f"Load order:",file=file_with_load_order,ephemeral=True)
+    # Load order is old, new server doesn't need it. Now needs modpack.html
+
+    # load_order = get_load_order(new_pack_no_dlc_compat_str)
+    # if isinstance(load_order,str):
+    #     load_order = load_order.encode("utf-8")
+    # file_with_load_order = discord.File(fp=io.BytesIO(load_order),filename=f"{modpack_name} load order.txt")
+
+
+    # await interaction.followup.send(content=f"Load order:",file=file_with_load_order,ephemeral=True)
+
+    await interaction.followup.send(content=f"Upload this to the server!",file=modlist_file,ephemeral=True)
     await interaction.channel.send(content=f"[{op_date}] {modpack_name} **Without the compat**, make sure the western sahara dlc is loaded. Made by {author.mention}", file=file_with_dlc)
     await interaction.channel.send(content=f"[{op_date}] {modpack_name} **with the compat**, only loading the modpack is needed. Made by {author.mention}",file=new_pack_no_dlc_compat)
 
