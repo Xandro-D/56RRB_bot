@@ -82,7 +82,7 @@ class ModerationDatabase:
         self.cursor.execute("DELETE FROM strikes WHERE expires_at <= ?", (now,))
         self.conn.commit()
 
-    def add_strike(self, user_id: int, duration_seconds: int):
+    def add_strike(self, user_id: int, duration_seconds: int = 15778463):
         expires_at = int(time.time()) + duration_seconds
         self.cursor.execute("INSERT INTO strikes (user_id, expires_at) VALUES (?, ?)", (user_id, expires_at))
         self.conn.commit()
