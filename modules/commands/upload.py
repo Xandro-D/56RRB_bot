@@ -92,10 +92,10 @@ class Upload(commands.Cog):
                     await interaction.followup.send(f"Not restarting!", ephemeral=True)
 
                 if view.value:
-                    await interaction.followup.send("Sending restart command!")
+                    await interaction.followup.send("Sending restart command!",ephemeral=True)
                     server = await ptero.get_server(SERVER_ID)
                     await server.restart()
-                    await interaction.followup.send("Restart command send !")
+                    await interaction.followup.send("Restart command send !",ephemeral=True)
 
 
 
