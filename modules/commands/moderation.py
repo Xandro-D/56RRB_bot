@@ -49,7 +49,7 @@ class Moderation(commands.Cog):
             db.reset_warnings(target.id)
             await interaction.response.send_message(f"{target.display_name} has been reset.")
 
-    app_commands.command(name="warn", description="Gives 1 warning to a person, warnings last until a strike.")
+    @app_commands.command(name="warn", description="Gives 1 warning to a person, warnings last until a strike.")
     async def warn(self,interaction: discord.Interaction, target: discord.Member, reason: str):
         if await utils.admin_check(interaction):
             if db.get_warnings(target.id) <= 4:
