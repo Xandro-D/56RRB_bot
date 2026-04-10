@@ -1,9 +1,6 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from modules import utils
-from modules import json_reader
-import random
 
 
 class WhoIsIn(commands.Cog):

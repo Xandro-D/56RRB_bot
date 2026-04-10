@@ -101,7 +101,7 @@ class Upload(commands.Cog):
 
         except Exception as e:
             await interaction.followup.send(
-                f"❌ Upload failed: `{e}`",
+                f"Upload failed: `{e}`",
                 ephemeral=True,
             )
 
