@@ -55,7 +55,10 @@ class Upload(commands.Cog):
         mission: discord.Attachment = None,
         modpack: discord.Attachment = None,
     ):
-        if not await utils.role_check(interaction.user, "Zeus"):
+        if not await utils.role_check(interaction, "Zeus"):
+            await interaction.response.send_message(
+                "You are not authorized to use this command."
+            )
             return
 
         await interaction.response.defer(ephemeral=True)

@@ -19,6 +19,7 @@ class FactCheck(commands.Cog):
             await interaction.response.send_message(
                 random.choice(json_reader.SILLY_FACT_CHECK_POSITIVE)
             )
+            interaction.response()
         else:
             await interaction.response.send_message(
                 random.choice(json_reader.SILLY_FACT_CHECK_NEGATIVE)

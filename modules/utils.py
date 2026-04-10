@@ -41,16 +41,17 @@ async def check_needed_roles(target: discord.Member,
             roles_needed_list.append(role)
     return roles_needed_list
 
-async def role_check(target: discord.Member,role_name:str):
+async def role_check(interaction,role_name:str):
     '''
     Checks if the target has a role or not
-    :param target:
+    :param interaction:
     :param role_name:
     :return: True if target has role False if not
     '''
     # Check if they have a role named "Admin"
-    target_roles = target.roles
-    if role_name in target_roles.name:
+    author = interaction.user
+    roles = author.roles
+    if role_name in roles.name:
         return True
     else:
         return False
