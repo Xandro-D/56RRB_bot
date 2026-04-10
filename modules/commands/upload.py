@@ -55,7 +55,7 @@ class Upload(commands.Cog):
         mission: discord.Attachment = None,
         modpack: discord.Attachment = None,
     ):
-        if not await utils.admin_check(interaction):
+        if not await utils.role_check(interaction.user, "Zeus"):
             return
 
         await interaction.response.defer(ephemeral=True)
