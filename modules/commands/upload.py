@@ -6,10 +6,10 @@ from modules import utils
 from ptero import PteroControl, Panel
 import paramiko
 import io
-from modules.config import sftp_password, sftp_user, sftp_port,sftp_ip,ptero_api_key
+from modules.config import sftp_password, sftp_user, sftp_port,sftp_ip,ptero_api_key,ptero_server_id
 from modules.ui import confirm_view
 
-SERVER_ID = "95635e32-7745-45ee-bae6-2ec458113233"
+SERVER_ID = ptero_server_id
 
 
 async def upload_file(attachment, host=sftp_ip, port=sftp_port, username=sftp_user, password=sftp_password, remote_dir="/"):
