@@ -54,7 +54,7 @@ async def role_check(interaction,role_name:str):
     role_names = []
     for i in roles:
         role_names.append(i.name)
-    if role_name in roles.name:
+    if role_name in role_names:
         return True
     else:
         return False
