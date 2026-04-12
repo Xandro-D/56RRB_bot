@@ -51,6 +51,9 @@ async def role_check(interaction,role_name:str):
     # Check if they have a role named "Admin"
     author = interaction.user
     roles = author.roles
+    role_names = []
+    for i in roles:
+        role_names.append(i.name)
     if role_name in roles.name:
         return True
     else:
