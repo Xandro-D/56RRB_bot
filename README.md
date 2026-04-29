@@ -145,6 +145,8 @@ On startup the bot will:
 | `/modpack` | `html_file` `op_date` `modpack_name` (optional) | Parse a modpack HTML export file and produce two output files: one for players who own the Western Sahara DLC and one that uses the compatibility mod instead. Both files are posted to the channel. | Admin |
 | `/upload_main` | `mission` (optional) `modpack` (optional) | Upload a mission file to the server's `mpmissions` folder and/or replace the server's `modlist.html` over SFTP. After a modpack upload the bot asks whether to restart the server via Pterodactyl. | Admin |
 
+Both arguments are optional and independent — you can upload only a mission, only a modpack, or both in a single command.
+
 ### Role and Training Utilities
 
 | Command | Arguments | Description | Permission |
@@ -163,7 +165,40 @@ Users interact with a designated message in a configured channel to self-assign 
 
 The bot queries the Arma 3 server using the A2S protocol every 10 minutes and updates a single message in the `server-status` channel with the current player list and active mission name.
 
-## Database
+## Server File Upload
+
+The `/upload_main` command lets admins push files directly to the Arma 3 game server from Discord without needing manual SFTP access. It connects to the server over SFTP using the credentials stored in the environment variables and uses the Pterodactyl panel API to optionally restart the server afterwards.
+
+### Uploading a Mission
+
+Attach the `.pbo` or mission file to the command in the `mission` argument. The bot uploads it to the `/mpmissions` directory on the server and confirms the filename once the transfer is complete.
+
+### Uploading a Modpack
+
+Attach the modpack HTML file (the output of `/modpack`, specifically the `modlist.html` variant) to the `modpack` argument. The bot renames the file to `modlist.html` and uploads it to the root of the server directory, replacing the existing modpack. After the upload succeeds the bot sends an ephemeral prompt asking whether to restart the server:
+
+- Clicking **Restart** sends a restart signal to the server via the Pterodactyl panel and confirms when the command has been sent.
+- Clicking **Keep running** leaves the server running with the new modpack loaded on next restart.
+
+### Uploading Both at Once
+
+Both `mission` and `modpack` can be provided in a single `/upload_main` command. The bot processes the mission upload first, then the modpack upload, and presents the restart prompt at the end.
+
+### Required Configuration
+
+The following environment variables must be set for `/upload_main` to work:
+
+| Variable | Description |
+|---|---|
+| `SFTP_IP` | IP address of the game server |
+| `SFTP_PORT` | SFTP port (usually 22) |
+| `SFTP_USERNAME` | SFTP login username |
+| `SFTP_PASSWORD` | SFTP login password |
+| `PTERO_API_KEY` | Pterodactyl client API key |
+| `PTERO_SERVER_ID` | Pterodactyl server identifier |
+
+If any of these are missing the upload will fail with an error message visible only to the user who ran the command.
+
 
 The bot uses a local SQLite database to track:
 - Strikes per user with expiration timestamps (6 months)
