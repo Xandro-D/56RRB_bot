@@ -54,21 +54,21 @@ async def promotion(ranks, target, branch, prefix_type, interaction, target_role
         except:
             fail_count += 1
             await interaction.channel.send(f"Something went wrong with {target.display_name} 's promotion.")
-        target_role_names = {r.name for r in target.roles if r != target.guild.default_role}
-        if not set(target_role_names) & set(js.ROLE_DICTIONARY.values()):
-            try:
-                bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
-                bravo_role_count = len(bravo_role.members)
-                charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
-                charlie_role_count = len(charlie_role.members)
-                if bravo_role_count > charlie_role_count:
-                    squad_to_join = "Charlie"
-                else:
-                    squad_to_join = "Bravo"
-                await target.send(
-                    f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
-            except:
-                pass
+        # target_role_names = {r.name for r in target.roles if r != target.guild.default_role}
+        # if not set(target_role_names) & set(js.ROLE_DICTIONARY.values()):
+        #     try:
+        #         bravo_role = discord.utils.get(target.guild.roles, name="bravo squadmember")
+        #         bravo_role_count = len(bravo_role.members)
+        #         charlie_role = discord.utils.get(target.guild.roles, name="charlie squadmember")
+        #         charlie_role_count = len(charlie_role.members)
+        #         if bravo_role_count > charlie_role_count:
+        #             squad_to_join = "Charlie"
+        #         else:
+        #             squad_to_join = "Bravo"
+        #         await target.send(
+        #             f'Join the **{squad_to_join}** squad now ! \n https://discord.com/channels/1090564451201196122/1125143726528934060 ')
+        #     except:
+        #         pass
 
 
 
