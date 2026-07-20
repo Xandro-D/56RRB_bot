@@ -125,9 +125,6 @@ def get_load_order(html_string):
 
 
 
-
-
-
 class ModPack(commands.Cog):
     def __init__(self, client: commands.Bot):
         self.client = client

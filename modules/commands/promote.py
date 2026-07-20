@@ -130,7 +130,7 @@ class Promote(commands.Cog):
                     prefix_type = js.ARMOR_ROLE_PREFIX
                     await promotion(armor_ranks, target, branch, prefix_type, interaction)
             await interaction.followup.send(f"A total of {success_count} people have been promoted\n"
-                                            f" {fail_count} promotions have failed", )
+                                            f" {fail_count} promotions have failed", ephemeral=True)
 
         @app_commands.command(
             name="reset_promotion_cooldown"

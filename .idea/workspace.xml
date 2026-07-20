@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="Fixed double qouttes,qoute issue">
+    <list default="true" id="af82a374-0d82-4808-9405-d963609492df" name="Changes" comment="Fixed command again">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modules/commands/modpack.py" beforeDir="false" afterPath="$PROJECT_DIR$/modules/commands/modpack.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +23,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="gdf" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -34,12 +34,12 @@
     &quot;assignee&quot;: &quot;Paxaj&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/Xandro-Diels/60RRB_bot.git",
-    "accountId": "d54da238-f70f-4cbd-8432-659860f2857d"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Xandro-Diels/60RRB_bot.git&quot;,
+    &quot;accountId&quot;: &quot;d54da238-f70f-4cbd-8432-659860f2857d&quot;
   }
-}]]></component>
+}</component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -57,8 +57,15 @@
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.bot (1).executor&quot;: &quot;Run&quot;,
     &quot;Python.bot.executor&quot;: &quot;Run&quot;,
+    &quot;Python.bot_old.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.config.executor&quot;: &quot;Run&quot;,
     &quot;Python.database.executor&quot;: &quot;Run&quot;,
+    &quot;Python.googleapi.executor&quot;: &quot;Run&quot;,
+    &quot;Python.moderation.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test.executor&quot;: &quot;Run&quot;,
+    &quot;Python.whoisin.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
@@ -66,24 +73,30 @@
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/xandro/PycharmProjects/RRB_Bot&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Xandro/PycharmProjects/60RRB_bot&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;run.code.analysis.last.selected.profile&quot;: &quot;aDefault&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.scopes&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Xandro\PycharmProjects\60RRB_bot" />
+      <recent name="C:\Users\Xandro\PycharmProjects\60RRB_bot\.venv" />
       <recent name="$PROJECT_DIR$" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Xandro\PycharmProjects\60RRB_bot\modules\commands" />
+      <recent name="C:\Users\Xandro\PycharmProjects\60RRB_bot\modules" />
+    </key>
   </component>
-  <component name="RunManager">
-    <configuration name="bot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.bot (1)">
+    <configuration name="bot (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="RRB_Bot" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -93,7 +106,7 @@
       </envs>
       <option name="SDK_HOME" value="" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bot.py" />
@@ -105,8 +118,39 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="bot" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="RRB_Bot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (60RRB_bot)" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bot_old.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.bot (1)" />
+      <item itemvalue="Python.bot" />
+    </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.bot" />
+        <item itemvalue="Python.bot (1)" />
+        <item itemvalue="Python.bot" />
+        <item itemvalue="Python.bot (1)" />
         <item itemvalue="Python.bot" />
       </list>
     </recent_temporary>
@@ -182,7 +226,247 @@
       <option name="project" value="LOCAL" />
       <updated>1767445184854</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Fixed bug where user would upload a pack with neither the dlc or the compat">
+      <option name="closed" value="true" />
+      <created>1767451968021</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1767451968021</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Updated promote to include a check for certain roles, added a command to check who still needs training">
+      <option name="closed" value="true" />
+      <created>1767645187090</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1767645187090</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Fixed thing with double/single qoutes">
+      <option name="closed" value="true" />
+      <created>1767646108586</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1767646108586</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Fixed modpack issue">
+      <option name="closed" value="true" />
+      <created>1767876374748</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1767876374748</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Changed amount of warnings needed for strike">
+      <option name="closed" value="true" />
+      <created>1767876461175</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1767876461175</updated>
+    </task>
+    <task id="LOCAL-00012" summary="updated the check role with a list">
+      <option name="closed" value="true" />
+      <created>1767877441863</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1767877441863</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Changed kick message">
+      <option name="closed" value="true" />
+      <created>1768503710208</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1768503710208</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Added a command that checks if poeple need bct and sends them a dm">
+      <option name="closed" value="true" />
+      <created>1768818560297</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1768818560297</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Fixed issue for python 3.9 (The silly microcomputer runs on 3.9)">
+      <option name="closed" value="true" />
+      <created>1768821556420</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1768821556420</updated>
+    </task>
+    <task id="LOCAL-00016" summary="Fixed issue for python 3.9 (The silly microcomputer runs on 3.9)">
+      <option name="closed" value="true" />
+      <created>1768821675755</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1768821675755</updated>
+    </task>
+    <task id="LOCAL-00017" summary="added reason input for both strike and warn">
+      <option name="closed" value="true" />
+      <created>1768863398724</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1768863398724</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Server tracking v1 :D">
+      <option name="closed" value="true" />
+      <created>1769523729410</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1769523729410</updated>
+    </task>
+    <task id="LOCAL-00019" summary="Made update time 5 mins">
+      <option name="closed" value="true" />
+      <created>1769523803435</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1769523803435</updated>
+    </task>
+    <task id="LOCAL-00020" summary="hotfix to display playername in stead of all the player data">
+      <option name="closed" value="true" />
+      <created>1769524400391</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1769524400391</updated>
+    </task>
+    <task id="LOCAL-00021" summary="added another illage character to the load order replacements">
+      <option name="closed" value="true" />
+      <created>1769525261543</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1769525261543</updated>
+    </task>
+    <task id="LOCAL-00022" summary="added another illage character to the load order replacements">
+      <option name="closed" value="true" />
+      <created>1769525301009</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1769525301009</updated>
+    </task>
+    <task id="LOCAL-00023" summary="updated loop to five mins">
+      <option name="closed" value="true" />
+      <created>1769525643396</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1769525643396</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Small bug fixes, spelling error and upped the loop time for server status">
+      <option name="closed" value="true" />
+      <created>1773094222973</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1773094222973</updated>
+    </task>
+    <task id="LOCAL-00025" summary="removed uneeded db functionts">
+      <option name="closed" value="true" />
+      <created>1773094380867</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1773094380867</updated>
+    </task>
+    <task id="LOCAL-00026" summary="updated modpack command to adjust to new hosting.">
+      <option name="closed" value="true" />
+      <created>1775220802919</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1775220802919</updated>
+    </task>
+    <task id="LOCAL-00027" summary="updated requirments.txt">
+      <option name="closed" value="true" />
+      <created>1775221290755</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1775221290755</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Major restructure and new command">
+      <option name="closed" value="true" />
+      <created>1775600614265</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1775600614265</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Fixed ephemeral on upload command">
+      <option name="closed" value="true" />
+      <created>1775600711745</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1775600711745</updated>
+    </task>
+    <task id="LOCAL-00030" summary="~">
+      <option name="closed" value="true" />
+      <created>1775836385319</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1775836385319</updated>
+    </task>
+    <task id="LOCAL-00031" summary="GDF adjustment to upload command">
+      <option name="closed" value="true" />
+      <created>1775836667178</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1775836667178</updated>
+    </task>
+    <task id="LOCAL-00032" summary="GDF fixes">
+      <option name="closed" value="true" />
+      <created>1775838275106</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1775838275106</updated>
+    </task>
+    <task id="LOCAL-00033" summary="Fixed @ in moderation.py">
+      <option name="closed" value="true" />
+      <created>1775849827154</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1775849827154</updated>
+    </task>
+    <task id="LOCAL-00034" summary="Added ptero_server_id to .env">
+      <option name="closed" value="true" />
+      <created>1775850458896</created>
+      <option name="number" value="00034" />
+      <option name="presentableId" value="LOCAL-00034" />
+      <option name="project" value="LOCAL" />
+      <updated>1775850458896</updated>
+    </task>
+    <task id="LOCAL-00035" summary="Fixed command">
+      <option name="closed" value="true" />
+      <created>1776025796712</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1776025796712</updated>
+    </task>
+    <task id="LOCAL-00036" summary="Fixed command again">
+      <option name="closed" value="true" />
+      <created>1776025932978</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1776025932978</updated>
+    </task>
+    <option name="localTasksCounter" value="37" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -200,13 +484,32 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated json file to include list for randomly selected responses from !factcheck" />
-    <MESSAGE value="UPDATED DB for cooldown, added react react part for adding roles on a cooldown." />
-    <MESSAGE value="added comments to code and small improvments" />
-    <MESSAGE value="added whois and whoisinboth commands" />
-    <MESSAGE value="Fixed client side modlist" />
-    <MESSAGE value="Fixed double qouttes,qoute issue" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed double qouttes,qoute issue" />
+    <MESSAGE value="Fixed modpack issue" />
+    <MESSAGE value="Changed amount of warnings needed for strike" />
+    <MESSAGE value="updated the check role with a list" />
+    <MESSAGE value="Changed kick message" />
+    <MESSAGE value="Added a command that checks if poeple need bct and sends them a dm" />
+    <MESSAGE value="Fixed issue for python 3.9 (The silly microcomputer runs on 3.9)" />
+    <MESSAGE value="added reason input for both strike and warn" />
+    <MESSAGE value="Server tracking v1 :D" />
+    <MESSAGE value="Made update time 5 mins" />
+    <MESSAGE value="hotfix to display playername in stead of all the player data" />
+    <MESSAGE value="added another illage character to the load order replacements" />
+    <MESSAGE value="updated loop to five mins" />
+    <MESSAGE value="Small bug fixes, spelling error and upped the loop time for server status" />
+    <MESSAGE value="removed uneeded db functionts" />
+    <MESSAGE value="updated modpack command to adjust to new hosting." />
+    <MESSAGE value="updated requirments.txt" />
+    <MESSAGE value="Major restructure and new command" />
+    <MESSAGE value="Fixed ephemeral on upload command" />
+    <MESSAGE value="~" />
+    <MESSAGE value="GDF adjustment to upload command" />
+    <MESSAGE value="GDF fixes" />
+    <MESSAGE value="Fixed @ in moderation.py" />
+    <MESSAGE value="Added ptero_server_id to .env" />
+    <MESSAGE value="Fixed command" />
+    <MESSAGE value="Fixed command again" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed command again" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/RRB_Bot$database.coverage" NAME="database Coverage Results" MODIFIED="1755267983816" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
